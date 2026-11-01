@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "security-reviewer/findings.schema.json",
+  "title": "security-reviewer findings report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "reviewer", "scope", "recommendation", "decision_note", "tooling", "not_assessed", "findings"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "reviewer": { "const": "security-reviewer" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target"],
+      "properties": {
+        "target": { "type": "string", "description": "Repo path or diff range reviewed" },
+        "base_ref": { "type": ["string", "null"] },
+        "head_ref": { "type": ["string", "null"] },
+        "git_available": { "type": "boolean" },
+        "runtime_endpoint": { "type": ["string", "null"], "enum": ["http://localhost:8080", null] }
+      }
+    },
+    "recommendation": { "enum": ["PASS", "WARN", "BLOCK"] },
+    "decision_note": { "const": "This is a recommendation. CI policy, not the model, makes the final decision." },
+    "tooling": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tool", "status"],
+        "properties": {
+          "tool": { "enum": ["semgrep", "trivy", "gitleaks", "promptfoo", "manual"] },
+          "version": { "type": ["string", "null"] },
+          "status": { "enum": ["ran", "missing", "skipped", "failed"] },
+          "output": { "type": ["string", "null"], "pattern": "^security-reviewer/reports/" }
+        }
+      }
+    },
+    "corpus_results": {
+      "type": "object",
+      "description": "Pass counts per promptfoo suite; a golden failure forces BLOCK",
+      "properties": {
+        "golden": { "$ref": "#/$defs/suite" },
+        "edge": { "$ref": "#/$defs/suite" },
+        "integration": { "$ref": "#/$defs/suite" },
+        "adversarial": { "$ref": "#/$defs/suite" }
+      }
+    },
+    "not_assessed": {
+      "type": "array",
+      "items": { "type": "object", "required": ["item", "reason"], "properties": { "item": { "type": "string" }, "reason": { "type": "string" } } }
+    },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } }
+  },
+  "$defs": {
+    "suite": {
+      "type": "object",
+      "required": ["passed", "failed", "not_run"],
+      "properties": { "passed": { "type": "integer" }, "failed": { "type": "integer" }, "not_run": { "type": "integer" } }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "severity", "category", "location", "reproduction", "reproducible", "evidence",
+                   "expected_secure_behaviour", "recommended_fix", "disposition"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^SR-[0-9]{8}-[0-9]{3}$" },
+        "title": { "type": "string", "maxLength": 140 },
+        "severity": { "enum": ["Critical", "High", "Medium", "Low", "Info"] },
+        "confidence": { "enum": ["High", "Medium", "Low"] },
+        "category": {
+          "type": "string",
+          "description": "Primary OWASP category",
+          "pattern": "^(ASI(0[1-9]|10)|LLM(0[1-9]|10)|WEB-A(0[1-9]|10)|API-API([1-9]|10))$"
+        },
+        "related": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^(ASI(0[1-9]|10)|LLM(0[1-9]|10)|WEB-A(0[1-9]|10)|API-API([1-9]|10)|CWE-[0-9]+)$" }
+        },
+        "check": {
+          "enum": ["goal-hijack", "tool-misuse", "identity-privilege", "memory-rag-poisoning", "unsafe-output",
+                   "loops-token-spend", "audit-correlation", "other"]
+        },
+        "location": {
+          "type": "object",
+          "minProperties": 1,
+          "properties": {
+            "file": { "type": "string" },
+            "line": { "type": "integer", "minimum": 1 },
+            "end_line": { "type": "integer", "minimum": 1 },
+            "request": { "type": "string", "description": "Method, path and body of the runtime request" },
+            "response": { "type": "string", "description": "Relevant response fields (tool events, done.path); secrets redacted" },
+            "corpus_case": { "type": "string" }
+          }
+        },
+        "reproduction": { "type": "string" },
+        "reproducible": { "type": "boolean", "description": "true only if the reviewer ran it and it failed" },
+        "evidence": { "type": "string", "description": "Excerpt, scanner rule ID or response fields. Secrets as [REDACTED]" },
+        "expected_secure_behaviour": { "type": "string" },
+        "recommended_fix": { "type": "string" },
+        "disposition": { "enum": ["BLOCK", "WARN", "PASS"] },
+        "owner": { "type": ["string", "null"], "description": "Filled by a human for WARN; the reviewer leaves it null" },
+        "expires": { "type": ["string", "null"], "format": "date", "description": "Filled by a human for WARN; the reviewer leaves it null" },
+        "waiver": { "type": "null", "description": "The reviewer can never waive; waivers live in CI policy" }
+      },
+      "allOf": [
+        { "if": { "properties": { "severity": { "enum": ["Critical", "High"] }, "reproducible": { "const": true } } },
+          "then": { "properties": { "disposition": { "const": "BLOCK" } } } }
+      ]
+    }
+  }
+}

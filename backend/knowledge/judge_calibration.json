@@ -1,0 +1,356 @@
+{
+ "_about": "Judge calibration set: claims checked against real evidence (chunk text from the vector DB). Labels were drafted by Claude; set reviewed=true after a human has checked every label, because a judge can't be calibrated against labels it wrote itself. Items 39+ use long evidence captured from the real agent (tool JSON, several chunks, live snapshot), like production.",
+ "reviewed": false,
+ "items": [
+  {
+   "id": 1,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.",
+   "claim": "Virat Kohli scored 4423 runs in the IPL from 2008 to 2017.",
+   "label": "supported",
+   "why": "exact"
+  },
+  {
+   "id": 2,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.",
+   "claim": "Kohli made 4,423 IPL runs at an average of 37.48.",
+   "label": "supported",
+   "why": "paraphrase, two facts"
+  },
+  {
+   "id": 3,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.",
+   "claim": "Kohli's highest IPL score is 113.",
+   "label": "supported",
+   "why": "exact"
+  },
+  {
+   "id": 4,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.",
+   "claim": "Kohli scored 4523 runs in the IPL.",
+   "label": "unsupported",
+   "why": "wrong number"
+  },
+  {
+   "id": 5,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.",
+   "claim": "Kohli has a strike rate of 139.9 in the IPL.",
+   "label": "unsupported",
+   "why": "wrong number"
+  },
+  {
+   "id": 6,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.",
+   "claim": "Kohli captained Royal Challengers Bangalore.",
+   "label": "unsupported",
+   "why": "true in real life but not in the evidence"
+  },
+  {
+   "id": 7,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.\nRG Sharma played IPL cricket for Deccan Chargers, Mumbai Indians. Batting 2008-2017: 4207 runs from 3214 balls in 153 matches, average 32.61, strike rate 130.9, highest score 109, 354 fours and 173 sixes. Bowling: 15 wickets, economy 7.95, average 29.33.",
+   "claim": "Rohit Sharma has a higher strike rate than Virat Kohli (130.9 vs 129.9).",
+   "label": "supported",
+   "why": "correct comparison"
+  },
+  {
+   "id": 8,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.\nRG Sharma played IPL cricket for Deccan Chargers, Mumbai Indians. Batting 2008-2017: 4207 runs from 3214 balls in 153 matches, average 32.61, strike rate 130.9, highest score 109, 354 fours and 173 sixes. Bowling: 15 wickets, economy 7.95, average 29.33.",
+   "claim": "Kohli's strike rate of 129.9 is better than Rohit's 130.9.",
+   "label": "unsupported",
+   "why": "numbers right, comparison backwards"
+  },
+  {
+   "id": 9,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.\nRG Sharma played IPL cricket for Deccan Chargers, Mumbai Indians. Batting 2008-2017: 4207 runs from 3214 balls in 153 matches, average 32.61, strike rate 130.9, highest score 109, 354 fours and 173 sixes. Bowling: 15 wickets, economy 7.95, average 29.33.",
+   "claim": "Kohli has scored more runs than Rohit Sharma: 4423 to 4207.",
+   "label": "supported",
+   "why": "correct comparison"
+  },
+  {
+   "id": 10,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.\nRG Sharma played IPL cricket for Deccan Chargers, Mumbai Indians. Batting 2008-2017: 4207 runs from 3214 balls in 153 matches, average 32.61, strike rate 130.9, highest score 109, 354 fours and 173 sixes. Bowling: 15 wickets, economy 7.95, average 29.33.",
+   "claim": "Rohit Sharma has hit more sixes than Kohli, 173 against 160.",
+   "label": "supported",
+   "why": "correct comparison"
+  },
+  {
+   "id": 11,
+   "evidence": "V Kohli played IPL cricket for Royal Challengers Bangalore. Batting 2008-2017: 4423 runs from 3405 balls in 141 matches, average 37.48, strike rate 129.9, highest score 113, 384 fours and 160 sixes. Bowling: 4 wickets, economy 8.8, average 92.0.\nRG Sharma played IPL cricket for Deccan Chargers, Mumbai Indians. Batting 2008-2017: 4207 runs from 3214 balls in 153 matches, average 32.61, strike rate 130.9, highest score 109, 354 fours and 173 sixes. Bowling: 15 wickets, economy 7.95, average 29.33.",
+   "claim": "Rohit Sharma has played only for Mumbai Indians.",
+   "label": "unsupported",
+   "why": "evidence says Deccan Chargers too"
+  },
+  {
+   "id": 12,
+   "evidence": "IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).",
+   "claim": "Sunrisers Hyderabad won IPL 2016, beating Royal Challengers Bangalore in the final.",
+   "label": "supported",
+   "why": "exact"
+  },
+  {
+   "id": 13,
+   "evidence": "IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).",
+   "claim": "Royal Challengers Bangalore won the 2016 IPL final.",
+   "label": "unsupported",
+   "why": "wrong winner"
+  },
+  {
+   "id": 14,
+   "evidence": "IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).",
+   "claim": "Kohli topped the 2016 run charts with 973 runs.",
+   "label": "supported",
+   "why": "paraphrase"
+  },
+  {
+   "id": 15,
+   "evidence": "IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).",
+   "claim": "B Kumar took the most wickets in IPL 2016, with 23.",
+   "label": "supported",
+   "why": "exact"
+  },
+  {
+   "id": 16,
+   "evidence": "IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).",
+   "claim": "YS Chahal took the most wickets in IPL 2016.",
+   "label": "unsupported",
+   "why": "Chahal was second"
+  },
+  {
+   "id": 17,
+   "evidence": "IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).",
+   "claim": "The 2016 final was played in Hyderabad.",
+   "label": "unsupported",
+   "why": "it was at M Chinnaswamy Stadium"
+  },
+  {
+   "id": 18,
+   "evidence": "IPL 2010 season: 60 matches. Champion: Chennai Super Kings, beating Mumbai Indians in the final on 2010-04-25 at Dr DY Patil Sports Academy. Most runs (orange cap race): SR Tendulkar (618), JH Kallis (572), SK Raina (528), SC Ganguly (493), M Vijay (458). Most wickets (purple cap race): PP Ojha (21), Harbhajan Singh (17), A Mishra (17), A Kumble (17), R Vinay Kumar (16).",
+   "claim": "Chennai Super Kings beat Mumbai Indians in the 2010 final.",
+   "label": "supported",
+   "why": "exact"
+  },
+  {
+   "id": 19,
+   "evidence": "IPL 2010 season: 60 matches. Champion: Chennai Super Kings, beating Mumbai Indians in the final on 2010-04-25 at Dr DY Patil Sports Academy. Most runs (orange cap race): SR Tendulkar (618), JH Kallis (572), SK Raina (528), SC Ganguly (493), M Vijay (458). Most wickets (purple cap race): PP Ojha (21), Harbhajan Singh (17), A Mishra (17), A Kumble (17), R Vinay Kumar (16).",
+   "claim": "SR Tendulkar was the top run scorer of IPL 2010 with 618 runs.",
+   "label": "supported",
+   "why": "paraphrase of orange cap list"
+  },
+  {
+   "id": 20,
+   "evidence": "IPL 2010 season: 60 matches. Champion: Chennai Super Kings, beating Mumbai Indians in the final on 2010-04-25 at Dr DY Patil Sports Academy. Most runs (orange cap race): SR Tendulkar (618), JH Kallis (572), SK Raina (528), SC Ganguly (493), M Vijay (458). Most wickets (purple cap race): PP Ojha (21), Harbhajan Singh (17), A Mishra (17), A Kumble (17), R Vinay Kumar (16).",
+   "claim": "Chennai Super Kings won the 2010 final by 22 runs.",
+   "label": "unsupported",
+   "why": "margin not in the evidence"
+  },
+  {
+   "id": 21,
+   "evidence": "Chennai Super Kings played 131 IPL matches between 2008 and 2015 and won 79. Titles: 2010, 2011.",
+   "claim": "Chennai Super Kings won the IPL in 2010 and 2011.",
+   "label": "supported",
+   "why": "titles"
+  },
+  {
+   "id": 22,
+   "evidence": "Chennai Super Kings played 131 IPL matches between 2008 and 2015 and won 79. Titles: 2010, 2011.",
+   "claim": "Chennai Super Kings have won three IPL titles.",
+   "label": "unsupported",
+   "why": "evidence lists two"
+  },
+  {
+   "id": 23,
+   "evidence": "Royal Challengers Bangalore played 152 IPL matches between 2008 and 2017 and won 73. Titles: none in 2008-2017.",
+   "claim": "Royal Challengers Bangalore did not win an IPL title between 2008 and 2017.",
+   "label": "supported",
+   "why": "negation supported"
+  },
+  {
+   "id": 24,
+   "evidence": "Royal Challengers Bangalore played 152 IPL matches between 2008 and 2017 and won 73. Titles: none in 2008-2017.",
+   "claim": "Royal Challengers Bangalore won the IPL in 2016.",
+   "label": "unsupported",
+   "why": "contradicted"
+  },
+  {
+   "id": 25,
+   "evidence": "SL Malinga played IPL cricket for Mumbai Indians. Batting 2008-2017: 88 runs from 99 balls in 20 matches, average 5.5, strike rate 88.89, highest score 17, 6 fours and 5 sixes. Bowling: 154 wickets, economy 6.88, average 19.04.",
+   "claim": "Malinga took 154 IPL wickets at an economy of 6.88.",
+   "label": "supported",
+   "why": "exact"
+  },
+  {
+   "id": 26,
+   "evidence": "SL Malinga played IPL cricket for Mumbai Indians. Batting 2008-2017: 88 runs from 99 balls in 20 matches, average 5.5, strike rate 88.89, highest score 17, 6 fours and 5 sixes. Bowling: 154 wickets, economy 6.88, average 19.04.",
+   "claim": "Malinga is effective because his low economy of 6.88 keeps runs down while he takes wickets.",
+   "label": "supported",
+   "why": "reasoning that follows from the figures"
+  },
+  {
+   "id": 27,
+   "evidence": "SL Malinga played IPL cricket for Mumbai Indians. Batting 2008-2017: 88 runs from 99 balls in 20 matches, average 5.5, strike rate 88.89, highest score 17, 6 fours and 5 sixes. Bowling: 154 wickets, economy 6.88, average 19.04.",
+   "claim": "Malinga is effective because of his slingy action and yorkers at the death.",
+   "label": "unsupported",
+   "why": "plausible but not in the evidence"
+  },
+  {
+   "id": 28,
+   "evidence": "No ball and free hit. A no ball is called most often when the bowler's front foot lands fully beyond the popping crease, or for a full toss above waist height. It adds one run to the batting side and is not a legal ball. In T20 cricket the next delivery after a front-foot no ball is a free hit: the batter can only be out in ways such as run out, not bowled, caught or lbw.",
+   "claim": "After a front-foot no ball, the next delivery is a free hit.",
+   "label": "supported",
+   "why": "rule"
+  },
+  {
+   "id": 29,
+   "evidence": "No ball and free hit. A no ball is called most often when the bowler's front foot lands fully beyond the popping crease, or for a full toss above waist height. It adds one run to the batting side and is not a legal ball. In T20 cricket the next delivery after a front-foot no ball is a free hit: the batter can only be out in ways such as run out, not bowled, caught or lbw.",
+   "claim": "On a free hit the batter cannot be bowled or caught, but can be run out.",
+   "label": "supported",
+   "why": "rule"
+  },
+  {
+   "id": 30,
+   "evidence": "No ball and free hit. A no ball is called most often when the bowler's front foot lands fully beyond the popping crease, or for a full toss above waist height. It adds one run to the batting side and is not a legal ball. In T20 cricket the next delivery after a front-foot no ball is a free hit: the batter can only be out in ways such as run out, not bowled, caught or lbw.",
+   "claim": "A no ball adds two runs to the batting side.",
+   "label": "unsupported",
+   "why": "evidence says one run"
+  },
+  {
+   "id": 31,
+   "evidence": "Leg before wicket (LBW). A batter is out lbw when the ball would have gone on to hit the stumps but hit the batter's body first, subject to conditions. The ball must not pitch outside leg stump. If the batter plays a shot, the impact must be in line with the stumps. If the batter offers no shot, impact outside off stump can still be out.",
+   "claim": "A batter cannot be out lbw if the ball pitches outside leg stump.",
+   "label": "supported",
+   "why": "rule"
+  },
+  {
+   "id": 32,
+   "evidence": "Leg before wicket (LBW). A batter is out lbw when the ball would have gone on to hit the stumps but hit the batter's body first, subject to conditions. The ball must not pitch outside leg stump. If the batter plays a shot, the impact must be in line with the stumps. If the batter offers no shot, impact outside off stump can still be out.",
+   "claim": "A batter can be out lbw even if the ball pitches outside leg stump.",
+   "label": "unsupported",
+   "why": "contradicted"
+  },
+  {
+   "id": 33,
+   "evidence": "Super over. If a T20 match is tied, a super over decides it. Each team bats one over with three batters (two wickets end it). The team with more runs wins. Super over deliveries are kept separate from the main match statistics.",
+   "claim": "In a super over each team bats one over and two wickets end the innings.",
+   "label": "supported",
+   "why": "rule"
+  },
+  {
+   "id": 34,
+   "evidence": "Super over. If a T20 match is tied, a super over decides it. Each team bats one over with three batters (two wickets end it). The team with more runs wins. Super over deliveries are kept separate from the main match statistics.",
+   "claim": "Super over runs count towards the batters' career statistics.",
+   "label": "unsupported",
+   "why": "contradicted: kept separate"
+  },
+  {
+   "id": 35,
+   "evidence": "IPL 2017 FINAL, the title decider: Mumbai Indians became champions. IPL 2017 final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal, Hyderabad: Mumbai Indians vs Rising Pune Supergiant. Mumbai Indians won the toss and chose to bat. Scores: Mumbai Indians 129/8 (20.0 overs); Rising Pune Supergiant 128/6 (20.0 overs). Result: Mumbai Indians won by 1 runs. Player of the match: KH Pandya. Top batters: SPD Smith 51 off 50, KH Pandya 47 off 38. Top bowlers: MG Johnson 3/26, JD Unadkat 2/19.",
+   "claim": "Mumbai Indians won the 2017 final by one run against Rising Pune Supergiant.",
+   "label": "supported",
+   "why": "exact"
+  },
+  {
+   "id": 36,
+   "evidence": "IPL 2017 FINAL, the title decider: Mumbai Indians became champions. IPL 2017 final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal, Hyderabad: Mumbai Indians vs Rising Pune Supergiant. Mumbai Indians won the toss and chose to bat. Scores: Mumbai Indians 129/8 (20.0 overs); Rising Pune Supergiant 128/6 (20.0 overs). Result: Mumbai Indians won by 1 runs. Player of the match: KH Pandya. Top batters: SPD Smith 51 off 50, KH Pandya 47 off 38. Top bowlers: MG Johnson 3/26, JD Unadkat 2/19.",
+   "claim": "KH Pandya was player of the match in the 2017 final and scored 47.",
+   "label": "supported",
+   "why": "KH Pandya 47 off 38"
+  },
+  {
+   "id": 37,
+   "evidence": "IPL 2017 FINAL, the title decider: Mumbai Indians became champions. IPL 2017 final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal, Hyderabad: Mumbai Indians vs Rising Pune Supergiant. Mumbai Indians won the toss and chose to bat. Scores: Mumbai Indians 129/8 (20.0 overs); Rising Pune Supergiant 128/6 (20.0 overs). Result: Mumbai Indians won by 1 runs. Player of the match: KH Pandya. Top batters: SPD Smith 51 off 50, KH Pandya 47 off 38. Top bowlers: MG Johnson 3/26, JD Unadkat 2/19.",
+   "claim": "Steve Smith's 51 won the 2017 final for Rising Pune Supergiant.",
+   "label": "unsupported",
+   "why": "RPS lost"
+  },
+  {
+   "id": 38,
+   "evidence": "IPL 2017 FINAL, the title decider: Mumbai Indians became champions. IPL 2017 final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal, Hyderabad: Mumbai Indians vs Rising Pune Supergiant. Mumbai Indians won the toss and chose to bat. Scores: Mumbai Indians 129/8 (20.0 overs); Rising Pune Supergiant 128/6 (20.0 overs). Result: Mumbai Indians won by 1 runs. Player of the match: KH Pandya. Top batters: SPD Smith 51 off 50, KH Pandya 47 off 38. Top bowlers: MG Johnson 3/26, JD Unadkat 2/19.",
+   "claim": "Mumbai Indians chased down 129 to win the 2017 final.",
+   "label": "unsupported",
+   "why": "MI batted first and defended"
+  },
+  {
+   "id": 39,
+   "evidence": "[doc:match-626] IPL 2016 match on 2016-05-18 at M Chinnaswamy Stadium, Bangalore: Royal Challengers Bangalore vs Kings XI Punjab. Kings XI Punjab won the toss and chose to field. Scores: Royal Challengers Bangalore 211/3 (15.0 overs); Kings XI Punjab 120/9 (14.0 overs). Result: Royal Challengers Bangalore won by 82 runs (Duckworth-Lewis). Player of the match: V Kohli. Top batters: V Kohli 113 off 50, CH Gayle 73 off 32. Top bowlers: YS Chahal 4/25, SR Watson 2/7.\n\n[doc:season-2016] IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).\n\n[doc:match-624] IPL 2016 match on 2016-05-16 at Eden Gardens, Kolkata: Kolkata Knight Riders vs Royal Challengers Bangalore. Royal Challengers Bangalore won the toss and chose to field. Scores: Kolkata Knight Riders 183/5 (20.0 overs); Royal Challengers Bangalore 186/1 (18.4 overs). Result: Royal Challengers Bangalore won by 9 wickets. Player of the match: V Kohli. Top batters: V Kohli 75 off 51, AB de Villiers 59 off 31. Top bowlers: S Aravind 2/41, Iqbal Abdulla 1/22.\n\n[tool:get_player_stats] {\"player\": \"V Kohli\", \"season\": 2016, \"matches\": 16, \"runs\": 973, \"balls\": 640, \"outs\": 12, \"fours\": 84, \"sixes\": 38, \"average\": 81.08, \"strike_rate\": 152.03, \"highest_score\": 113}",
+   "claim": "V Kohli scored 973 runs in IPL 2016 at a strike rate of 152.03.",
+   "label": "supported",
+   "why": "long evidence: tool + 3 docs"
+  },
+  {
+   "id": 40,
+   "evidence": "[doc:match-626] IPL 2016 match on 2016-05-18 at M Chinnaswamy Stadium, Bangalore: Royal Challengers Bangalore vs Kings XI Punjab. Kings XI Punjab won the toss and chose to field. Scores: Royal Challengers Bangalore 211/3 (15.0 overs); Kings XI Punjab 120/9 (14.0 overs). Result: Royal Challengers Bangalore won by 82 runs (Duckworth-Lewis). Player of the match: V Kohli. Top batters: V Kohli 113 off 50, CH Gayle 73 off 32. Top bowlers: YS Chahal 4/25, SR Watson 2/7.\n\n[doc:season-2016] IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).\n\n[doc:match-624] IPL 2016 match on 2016-05-16 at Eden Gardens, Kolkata: Kolkata Knight Riders vs Royal Challengers Bangalore. Royal Challengers Bangalore won the toss and chose to field. Scores: Kolkata Knight Riders 183/5 (20.0 overs); Royal Challengers Bangalore 186/1 (18.4 overs). Result: Royal Challengers Bangalore won by 9 wickets. Player of the match: V Kohli. Top batters: V Kohli 75 off 51, AB de Villiers 59 off 31. Top bowlers: S Aravind 2/41, Iqbal Abdulla 1/22.\n\n[tool:get_player_stats] {\"player\": \"V Kohli\", \"season\": 2016, \"matches\": 16, \"runs\": 973, \"balls\": 640, \"outs\": 12, \"fours\": 84, \"sixes\": 38, \"average\": 81.08, \"strike_rate\": 152.03, \"highest_score\": 113}",
+   "claim": "V Kohli scored 973 runs in IPL 2016 at a strike rate of 125.4.",
+   "label": "unsupported",
+   "why": "long evidence, wrong number"
+  },
+  {
+   "id": 41,
+   "evidence": "[doc:match-626] IPL 2016 match on 2016-05-18 at M Chinnaswamy Stadium, Bangalore: Royal Challengers Bangalore vs Kings XI Punjab. Kings XI Punjab won the toss and chose to field. Scores: Royal Challengers Bangalore 211/3 (15.0 overs); Kings XI Punjab 120/9 (14.0 overs). Result: Royal Challengers Bangalore won by 82 runs (Duckworth-Lewis). Player of the match: V Kohli. Top batters: V Kohli 113 off 50, CH Gayle 73 off 32. Top bowlers: YS Chahal 4/25, SR Watson 2/7.\n\n[doc:season-2016] IPL 2016 season: 60 matches. Champion: Sunrisers Hyderabad, beating Royal Challengers Bangalore in the final on 2016-05-29 at M Chinnaswamy Stadium. Most runs (orange cap race): V Kohli (973), DA Warner (848), AB de Villiers (687), S Dhawan (501), G Gambhir (501). Most wickets (purple cap race): B Kumar (23), YS Chahal (21), SR Watson (20), DS Kulkarni (18), Mustafizur Rahman (17).\n\n[doc:match-624] IPL 2016 match on 2016-05-16 at Eden Gardens, Kolkata: Kolkata Knight Riders vs Royal Challengers Bangalore. Royal Challengers Bangalore won the toss and chose to field. Scores: Kolkata Knight Riders 183/5 (20.0 overs); Royal Challengers Bangalore 186/1 (18.4 overs). Result: Royal Challengers Bangalore won by 9 wickets. Player of the match: V Kohli. Top batters: V Kohli 75 off 51, AB de Villiers 59 off 31. Top bowlers: S Aravind 2/41, Iqbal Abdulla 1/22.\n\n[tool:get_player_stats] {\"player\": \"V Kohli\", \"season\": 2016, \"matches\": 16, \"runs\": 973, \"balls\": 640, \"outs\": 12, \"fours\": 84, \"sixes\": 38, \"average\": 81.08, \"strike_rate\": 152.03, \"highest_score\": 113}",
+   "claim": "V Kohli's 973 runs in 2016 were the most by anyone in IPL history.",
+   "label": "unsupported",
+   "why": "long evidence, record not stated"
+  },
+  {
+   "id": 42,
+   "evidence": "[doc:rule-decision-review-system-drs] Decision Review System (DRS). DRS lets a team challenge an on-field umpire's decision using ball tracking, edge detection (UltraEdge or Snicko) and replays. In the IPL each team gets a limited number of unsuccessful reviews per innings. For lbw, an \"umpire's call\" result means the on-field decision stands because the ball tracking was marginal, and the team keeps its review. Note: DRS was introduced to the IPL in 2018, after the seasons covered by this dataset.",
+   "claim": "In the IPL each team gets a limited number of unsuccessful reviews per innings.",
+   "label": "supported",
+   "why": "long evidence, verbatim"
+  },
+  {
+   "id": 43,
+   "evidence": "[doc:rule-decision-review-system-drs] Decision Review System (DRS). DRS lets a team challenge an on-field umpire's decision using ball tracking, edge detection (UltraEdge or Snicko) and replays. In the IPL each team gets a limited number of unsuccessful reviews per innings. For lbw, an \"umpire's call\" result means the on-field decision stands because the ball tracking was marginal, and the team keeps its review. Note: DRS was introduced to the IPL in 2018, after the seasons covered by this dataset.",
+   "claim": "In the IPL each team gets unlimited reviews per innings.",
+   "label": "unsupported",
+   "why": "long evidence, contradicted"
+  },
+  {
+   "id": 44,
+   "evidence": "[doc:match-211] IPL 2010 match on 2010-04-06 at MA Chidambaram Stadium, Chepauk, Chennai: Chennai Super Kings vs Mumbai Indians. Chennai Super Kings won the toss and chose to bat. Scores: Chennai Super Kings 165/4 (20.0 overs); Mumbai Indians 141/9 (20.0 overs). Result: Chennai Super Kings won by 24 runs. Player of the match: SK Raina. Top batters: SR Tendulkar 45 off 35, ML Hayden 35 off 31. Top bowlers: T Thushara 2/16, R Ashwin 2/22.\n\n[doc:match-234] IPL 2010 FINAL, the title decider: Chennai Super Kings became champions. IPL 2010 final on 2010-04-25 at Dr DY Patil Sports Academy, Mumbai: Chennai Super Kings vs Mumbai Indians. Chennai Super Kings won the toss and chose to bat. Scores: Chennai Super Kings 168/5 (20.0 overs); Mumbai Indians 146/9 (20.0 overs). Result: Chennai Super Kings won by 22 runs. Player of the match: SK Raina. Top batters: SK Raina 57 off 35, SR Tendulkar 48 off 45. Top bowlers: CRD Fernando 2/23, SB Jakati 2/26.\n\n[doc:match-182] IPL 2010 match on 2010-03-16 at Eden Gardens, Kolkata: Chennai Super Kings vs Kolkata Knight Riders. Chennai Super Kings won the toss and chose to bat. Scores: Chennai Super Kings 164/3 (20.0 overs); Kolkata Knight Riders 109/10 (19.2 overs). Result: Chennai Super Kings won by 55 runs. Player of the match: MS Dhoni. Top batters: MS Dhoni 66 off 33, S Badrinath 43 off 33. Top bowlers: JM Kemp 3/12, L Balaji 2/9.\n\n[tool:team_season_record] {\"team\": \"Chennai Super Kings\", \"season\": 2010, \"played\": 16, \"won\": 9, \"season_champion\": \"Chennai Super Kings\"}",
+   "claim": "In IPL 2010 Chennai Super Kings played 16 matches, won 9 and became champions.",
+   "label": "supported",
+   "why": "tool JSON + live"
+  },
+  {
+   "id": 45,
+   "evidence": "[doc:match-211] IPL 2010 match on 2010-04-06 at MA Chidambaram Stadium, Chepauk, Chennai: Chennai Super Kings vs Mumbai Indians. Chennai Super Kings won the toss and chose to bat. Scores: Chennai Super Kings 165/4 (20.0 overs); Mumbai Indians 141/9 (20.0 overs). Result: Chennai Super Kings won by 24 runs. Player of the match: SK Raina. Top batters: SR Tendulkar 45 off 35, ML Hayden 35 off 31. Top bowlers: T Thushara 2/16, R Ashwin 2/22.\n\n[doc:match-234] IPL 2010 FINAL, the title decider: Chennai Super Kings became champions. IPL 2010 final on 2010-04-25 at Dr DY Patil Sports Academy, Mumbai: Chennai Super Kings vs Mumbai Indians. Chennai Super Kings won the toss and chose to bat. Scores: Chennai Super Kings 168/5 (20.0 overs); Mumbai Indians 146/9 (20.0 overs). Result: Chennai Super Kings won by 22 runs. Player of the match: SK Raina. Top batters: SK Raina 57 off 35, SR Tendulkar 48 off 45. Top bowlers: CRD Fernando 2/23, SB Jakati 2/26.\n\n[doc:match-182] IPL 2010 match on 2010-03-16 at Eden Gardens, Kolkata: Chennai Super Kings vs Kolkata Knight Riders. Chennai Super Kings won the toss and chose to bat. Scores: Chennai Super Kings 164/3 (20.0 overs); Kolkata Knight Riders 109/10 (19.2 overs). Result: Chennai Super Kings won by 55 runs. Player of the match: MS Dhoni. Top batters: MS Dhoni 66 off 33, S Badrinath 43 off 33. Top bowlers: JM Kemp 3/12, L Balaji 2/9.\n\n[tool:team_season_record] {\"team\": \"Chennai Super Kings\", \"season\": 2010, \"played\": 16, \"won\": 9, \"season_champion\": \"Chennai Super Kings\"}",
+   "claim": "In 2011, Chennai Super Kings played 14 matches and won 7.",
+   "label": "unsupported",
+   "why": "season not in the evidence (real eval failure)"
+  },
+  {
+   "id": 46,
+   "evidence": "[doc:match-59] IPL 2017 FINAL, the title decider: Mumbai Indians became champions. IPL 2017 final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal, Hyderabad: Mumbai Indians vs Rising Pune Supergiant. Mumbai Indians won the toss and chose to bat. Scores: Mumbai Indians 129/8 (20.0 overs); Rising Pune Supergiant 128/6 (20.0 overs). Result: Mumbai Indians won by 1 runs. Player of the match: KH Pandya. Top batters: SPD Smith 51 off 50, KH Pandya 47 off 38. Top bowlers: MG Johnson 3/26, JD Unadkat 2/19.\n\n[doc:season-2017] IPL 2017 season: 59 matches. Champion: Mumbai Indians, beating Rising Pune Supergiant in the final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal. Most runs (orange cap race): DA Warner (641), G Gambhir (498), S Dhawan (479), SPD Smith (472), SK Raina (442). Most wickets (purple cap race): B Kumar (26), JD Unadkat (24), JJ Bumrah (20), MJ McClenaghan (19), Imran Tahir (18).\n\n[doc:match-52] IPL 2017 match on 2017-05-13 at Green Park, Kanpur: Gujarat Lions vs Sunrisers Hyderabad. Sunrisers Hyderabad won the toss and chose to field. Scores: Gujarat Lions 154/10 (19.2 overs); Sunrisers Hyderabad 158/2 (18.1 overs). Result: Sunrisers Hyderabad won by 8 wickets. Player of the match: Mohammed Siraj. Top batters: DA Warner 69 off 52, V Shankar 63 off 44. Top bowlers: Mohammed Siraj 4/32, Rashid Khan 3/34.\n\n[tool:season_summary] {\"season\": 2017, \"matches\": 59, \"champion\": \"Mumbai Indians\", \"runner_up\": \"Rising Pune Supergiant\", \"final\": {\"date\": \"2017-05-21\", \"venue\": \"Rajiv Gandhi International Stadium, Uppal\", \"player_of_match\": \"KH Pandya\", \"margin\": \"1 runs\"}, \"most_runs\": [{\"player\": \"DA Warner\", \"runs\": 641}, {\"player\": \"G Gambhir\", \"runs\": 498}, {\"player\": \"S Dhawan\", \"runs\": 479}], \"most_wickets\": [{\"player\": \"B Kumar\", \"wickets\": 26}, {\"player\": \"JD Unadkat\", \"wickets\": 24}, {\"player\": \"JJ Bumrah\", \"wickets\": 20}]}",
+   "claim": "KH Pandya was player of the match in the IPL 2017 final.",
+   "label": "supported",
+   "why": "long evidence"
+  },
+  {
+   "id": 47,
+   "evidence": "[doc:match-59] IPL 2017 FINAL, the title decider: Mumbai Indians became champions. IPL 2017 final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal, Hyderabad: Mumbai Indians vs Rising Pune Supergiant. Mumbai Indians won the toss and chose to bat. Scores: Mumbai Indians 129/8 (20.0 overs); Rising Pune Supergiant 128/6 (20.0 overs). Result: Mumbai Indians won by 1 runs. Player of the match: KH Pandya. Top batters: SPD Smith 51 off 50, KH Pandya 47 off 38. Top bowlers: MG Johnson 3/26, JD Unadkat 2/19.\n\n[doc:season-2017] IPL 2017 season: 59 matches. Champion: Mumbai Indians, beating Rising Pune Supergiant in the final on 2017-05-21 at Rajiv Gandhi International Stadium, Uppal. Most runs (orange cap race): DA Warner (641), G Gambhir (498), S Dhawan (479), SPD Smith (472), SK Raina (442). Most wickets (purple cap race): B Kumar (26), JD Unadkat (24), JJ Bumrah (20), MJ McClenaghan (19), Imran Tahir (18).\n\n[doc:match-52] IPL 2017 match on 2017-05-13 at Green Park, Kanpur: Gujarat Lions vs Sunrisers Hyderabad. Sunrisers Hyderabad won the toss and chose to field. Scores: Gujarat Lions 154/10 (19.2 overs); Sunrisers Hyderabad 158/2 (18.1 overs). Result: Sunrisers Hyderabad won by 8 wickets. Player of the match: Mohammed Siraj. Top batters: DA Warner 69 off 52, V Shankar 63 off 44. Top bowlers: Mohammed Siraj 4/32, Rashid Khan 3/34.\n\n[tool:season_summary] {\"season\": 2017, \"matches\": 59, \"champion\": \"Mumbai Indians\", \"runner_up\": \"Rising Pune Supergiant\", \"final\": {\"date\": \"2017-05-21\", \"venue\": \"Rajiv Gandhi International Stadium, Uppal\", \"player_of_match\": \"KH Pandya\", \"margin\": \"1 runs\"}, \"most_runs\": [{\"player\": \"DA Warner\", \"runs\": 641}, {\"player\": \"G Gambhir\", \"runs\": 498}, {\"player\": \"S Dhawan\", \"runs\": 479}], \"most_wickets\": [{\"player\": \"B Kumar\", \"wickets\": 26}, {\"player\": \"JD Unadkat\", \"wickets\": 24}, {\"player\": \"JJ Bumrah\", \"wickets\": 20}]}",
+   "claim": "B Kumar's 26 wickets won Mumbai Indians the 2017 final.",
+   "label": "unsupported",
+   "why": "season tally used to explain a final"
+  },
+  {
+   "id": 48,
+   "evidence": "[doc:player-sl-malinga] SL Malinga played IPL cricket for Mumbai Indians. Batting 2008-2017: 88 runs from 99 balls in 20 matches, average 5.5, strike rate 88.89, highest score 17, 6 fours and 5 sixes. Bowling: 154 wickets, economy 6.88, average 19.04.\n\n[doc:player-mm-sharma] MM Sharma played IPL cricket for Chennai Super Kings, Kings XI Punjab. Batting 2008-2017: 112 runs from 102 balls in 20 matches, average 8.0, strike rate 109.8, highest score 21, 8 fours and 4 sixes. Bowling: 83 wickets, economy 8.12, average 25.01.\n\n[doc:player-mj-mcclenaghan] MJ McClenaghan played IPL cricket for Mumbai Indians. Batting 2008-2017: 63 runs from 44 balls in 12 matches, average 7.88, strike rate 143.18, highest score 20, 2 fours and 6 sixes. Bowling: 54 wickets, economy 8.61, average 24.61.\n\n[tool:get_player_stats] {\"player\": \"SL Malinga\", \"season\": \"all (2008-2017)\", \"matches\": 110, \"wickets\": 154, \"runs_conceded\": 2932, \"overs\": \"426.2\", \"economy\": 6.88, \"average\": 19.04}",
+   "claim": "SL Malinga took 154 IPL wickets at an economy of 6.88.",
+   "label": "supported",
+   "why": "tool + docs"
+  },
+  {
+   "id": 49,
+   "evidence": "[doc:player-sl-malinga] SL Malinga played IPL cricket for Mumbai Indians. Batting 2008-2017: 88 runs from 99 balls in 20 matches, average 5.5, strike rate 88.89, highest score 17, 6 fours and 5 sixes. Bowling: 154 wickets, economy 6.88, average 19.04.\n\n[doc:player-mm-sharma] MM Sharma played IPL cricket for Chennai Super Kings, Kings XI Punjab. Batting 2008-2017: 112 runs from 102 balls in 20 matches, average 8.0, strike rate 109.8, highest score 21, 8 fours and 4 sixes. Bowling: 83 wickets, economy 8.12, average 25.01.\n\n[doc:player-mj-mcclenaghan] MJ McClenaghan played IPL cricket for Mumbai Indians. Batting 2008-2017: 63 runs from 44 balls in 12 matches, average 7.88, strike rate 143.18, highest score 20, 2 fours and 6 sixes. Bowling: 54 wickets, economy 8.61, average 24.61.\n\n[tool:get_player_stats] {\"player\": \"SL Malinga\", \"season\": \"all (2008-2017)\", \"matches\": 110, \"wickets\": 154, \"runs_conceded\": 2932, \"overs\": \"426.2\", \"economy\": 6.88, \"average\": 19.04}",
+   "claim": "Malinga's bowling strike rate of 88.89 shows why he is so effective.",
+   "label": "unsupported",
+   "why": "88.89 is his batting strike rate"
+  },
+  {
+   "id": 50,
+   "evidence": "[doc:player-sl-malinga] SL Malinga played IPL cricket for Mumbai Indians. Batting 2008-2017: 88 runs from 99 balls in 20 matches, average 5.5, strike rate 88.89, highest score 17, 6 fours and 5 sixes. Bowling: 154 wickets, economy 6.88, average 19.04.\n\n[doc:player-mm-sharma] MM Sharma played IPL cricket for Chennai Super Kings, Kings XI Punjab. Batting 2008-2017: 112 runs from 102 balls in 20 matches, average 8.0, strike rate 109.8, highest score 21, 8 fours and 4 sixes. Bowling: 83 wickets, economy 8.12, average 25.01.\n\n[doc:player-mj-mcclenaghan] MJ McClenaghan played IPL cricket for Mumbai Indians. Batting 2008-2017: 63 runs from 44 balls in 12 matches, average 7.88, strike rate 143.18, highest score 20, 2 fours and 6 sixes. Bowling: 54 wickets, economy 8.61, average 24.61.\n\n[tool:get_player_stats] {\"player\": \"SL Malinga\", \"season\": \"all (2008-2017)\", \"matches\": 110, \"wickets\": 154, \"runs_conceded\": 2932, \"overs\": \"426.2\", \"economy\": 6.88, \"average\": 19.04}",
+   "claim": "SL Malinga has taken more IPL wickets than MM Sharma.",
+   "label": "supported",
+   "why": "comparison across two docs"
+  }
+ ]
+}

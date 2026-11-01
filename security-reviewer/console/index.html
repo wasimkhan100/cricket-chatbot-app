@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review Console</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --ink: #16181d; --muted: #5d6470; --line: #dfe3ea; --code: #f0f2f5;
+    --accent: #2a78d6; --good: #0ca30c; --warn: #b57f00; --bad: #d03b3b; --run: #7a4dd8;
+    --good-bg: #e7f6e7; --warn-bg: #fff4d6; --bad-bg: #fbe6e6; --run-bg: #efe8fc; --idle-bg: #eceff3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111318; --card: #1a1d24; --ink: #e8eaee; --muted: #9aa2ae; --line: #2c313b; --code: #22262e;
+      --accent: #3987e5; --good: #3fbf3f; --warn: #e0a92a; --bad: #ef6464; --run: #a383f0;
+      --good-bg: #16301a; --warn-bg: #352a10; --bad-bg: #3a1a1a; --run-bg: #261d3d; --idle-bg: #242830;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { padding: 20px 16px 8px; max-width: 1100px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  .sub { color: var(--muted); margin: 0; }
+  main { max-width: 1100px; margin: 0 auto; padding: 8px 16px 60px; }
+  .flow { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 14px 0 18px; }
+  .node { padding: 6px 10px; border-radius: 8px; background: var(--idle-bg); font-size: 13px; border: 1px solid var(--line); }
+  .arrow { color: var(--muted); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .card.locked { opacity: .55; }
+  .card-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 600; flex: none; }
+  .card-head h2 { margin: 0; font-size: 17px; }
+  .chip { font-size: 12px; padding: 2px 8px; border-radius: 99px; background: var(--code); color: var(--muted); }
+  .badge { margin-left: auto; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 99px; }
+  .s-waiting, .s-skipped { background: var(--idle-bg); color: var(--muted); }
+  .s-ready { background: var(--code); color: var(--accent); }
+  .s-running { background: var(--run-bg); color: var(--run); }
+  .s-review { background: var(--warn-bg); color: var(--warn); }
+  .s-accepted { background: var(--good-bg); color: var(--good); }
+  .s-failed { background: var(--bad-bg); color: var(--bad); }
+  .what { color: var(--muted); margin: 8px 0; }
+  .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 12px 0 4px; }
+  pre, .cmd { background: var(--code); border-radius: 8px; padding: 8px 10px; font: 12.5px/1.45 ui-monospace, Menlo, Consolas, monospace;
+              white-space: pre-wrap; word-break: break-word; margin: 0 0 4px; }
+  textarea { width: 100%; min-height: 190px; background: var(--code); color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+             padding: 8px; font: 12.5px/1.45 ui-monospace, Menlo, Consolas, monospace; }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  button { font: inherit; font-size: 14px; padding: 7px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.danger { color: var(--bad); }
+  button:disabled { opacity: .5; cursor: default; }
+  .feed { max-height: 340px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+  .feed div { padding: 2px 0; border-bottom: 1px dashed var(--line); white-space: pre-wrap; word-break: break-word; }
+  .k-cmd { color: var(--accent); } .k-tool { color: var(--run); } .k-blocked { color: var(--bad); font-weight: 600; }
+  .k-say { color: var(--ink); } .k-result, .k-out { color: var(--muted); } .k-done { color: var(--good); } .k-error { color: var(--bad); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  .tablewrap { overflow-x: auto; }
+  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+  .stat { background: var(--code); border-radius: 8px; padding: 6px 12px; } .stat b { font-size: 18px; margin-right: 4px; }
+  .sev-Critical, .sev-CRITICAL, .st-fail { color: var(--bad); font-weight: 600; }
+  .sev-High, .sev-HIGH { color: var(--bad); }
+  .sev-Medium, .sev-MEDIUM, .st-notrun { color: var(--warn); }
+  .st-pass { color: var(--good); }
+  details { margin: 4px 0; } summary { cursor: pointer; }
+  .finding { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; }
+  .finding .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .finding select, .finding input { font: inherit; font-size: 13.5px; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+  .finding input[type=text] { min-width: 150px; }
+  .decided { border-left: 4px solid var(--good); }
+  .rec { font-size: 28px; font-weight: 700; }
+  .rec-BLOCK { color: var(--bad); } .rec-WARN { color: var(--warn); } .rec-PASS { color: var(--good); } .rec-INCOMPLETE { color: var(--muted); }
+  .note { color: var(--muted); font-size: 13px; }
+  .err { color: var(--bad); }
+  @media (max-width: 600px) { .badge { margin-left: 0; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Review Console</h1>
+  <p class="sub">The security review as a chain of agents. Nothing runs until you approve it, and you check each result before the next agent starts.</p>
+</header>
+<main>
+  <div class="flow" id="flow"></div>
+  <div id="err" class="err"></div>
+  <div id="stages"></div>
+</main>
+<script>
+const TOKEN = new URLSearchParams(location.hash.slice(1)).get("token") || "";
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const STATUS = {waiting: "Waiting", ready: "Needs your approval", running: "Running", review: "Check the result",
+                accepted: "Accepted", skipped: "Skipped", failed: "Failed: check the log"};
+let promptDraft = null, openFeeds = {}, drafts = {}, last = null;
+
+async function api(path, body) {
+  const r = await fetch(path, {method: body ? "POST" : "GET", headers: {"X-Console-Token": TOKEN, "Content-Type": "application/json"},
+                               body: body ? JSON.stringify(body) : undefined});
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || r.statusText);
+  return data;
+}
+
+function feed(s) {
+  if (!s.log.length) return "";
+  const open = openFeeds[s.id] ?? (s.status === "running");
+  return `<details ${open ? "open" : ""} data-feed="${s.id}"><summary class="label">What the agent is doing (${s.log.length} lines)</summary>
+    <div class="feed" id="feed-${s.id}">${s.log.map(l => `<div class="k-${esc(l.kind)}">${l.kind === "tool" ? "→ " : l.kind === "blocked" ? "⛔ " : l.kind === "cmd" ? "$ " : ""}${esc(l.text)}</div>`).join("")}</div></details>`;
+}
+
+function summary(s) {
+  const x = s.summary;
+  if (!x) return "";
+  if (x.error) return `<p class="err">${esc(x.error)}</p>`;
+  if (s.id === "secrets") return `<div class="label">Result</div><div class="stats"><span class="stat"><b>${x.in_scope}</b>in scope</span><span class="stat"><b>${x.total - x.in_scope}</b>in excluded folders</span></div>
+    <p class="note">Secret values are redacted: only the file, line and rule are shown.</p>
+    <div class="tablewrap"><table><tr><th>File</th><th>Line</th><th>Rule</th><th>Scope</th></tr>
+    ${x.rows.map(r => `<tr><td>${esc(r.file)}</td><td>${esc(r.line)}</td><td>${esc(r.rule)}</td><td>${r.in_scope ? "in scope" : "excluded"}</td></tr>`).join("")}</table></div>`;
+  if (s.id === "deps") return `<div class="label">Result</div><div class="stats">${Object.entries(x.counts).filter(([, n]) => n).map(([k, n]) => `<span class="stat sev-${k}"><b>${n}</b>${k.toLowerCase()}</span>`).join("") || '<span class="stat"><b>0</b>vulnerabilities</span>'}
+    <span class="stat"><b>${x.secrets}</b>secrets</span><span class="stat"><b>${x.misconfigurations}</b>misconfigurations</span></div>
+    <div class="tablewrap"><table><tr><th>Severity</th><th>Package</th><th>Version</th><th>ID</th><th>Fixed in</th><th>Where</th></tr>
+    ${x.rows.slice(0, 60).map(r => `<tr><td class="sev-${esc(r.severity)}">${esc(r.severity)}</td><td>${esc(r.pkg)}</td><td>${esc(r.version)}</td><td>${esc(r.id)}</td><td>${esc(r.fixed) || "no fix yet"}</td><td>${esc(r.target)}</td></tr>`).join("")}</table></div>`;
+  if (s.id === "runtime") return `<div class="label">Result</div><div class="stats"><span class="stat st-pass"><b>${x.counts.pass}</b>pass</span><span class="stat st-fail"><b>${x.counts.fail}</b>fail</span><span class="stat st-notrun"><b>${x.counts["not run"]}</b>not run</span></div>
+    <div class="tablewrap"><table><tr><th>Case</th><th>Suite</th><th>Test</th><th>Result</th><th>Why it failed</th></tr>
+    ${x.rows.map(r => `<tr><td>${esc(r.case)}</td><td>${esc(r.suite)}</td><td>${esc(r.title)}</td><td class="st-${r.status.replace(" ", "")}">${esc(r.status)}</td><td>${esc(r.why)}</td></tr>`).join("")}</table></div>`;
+  if (s.id === "review") return `<div class="label">Result</div><div class="stats"><span class="stat"><b class="rec-${esc(x.recommendation)}">${esc(x.recommendation)}</b>agent's recommendation</span>
+    ${Object.entries(x.by_severity).map(([k, n]) => `<span class="stat sev-${k}"><b>${n}</b>${k}</span>`).join("")}</div>
+    <p class="note">Files: reports/findings.json, findings.sarif${x.summary_md ? ", summary.md" : " (summary.md missing)"}. Next you triage each finding.</p>`;
+  if (s.id === "triage") return triage(x);
+  if (s.id === "gate") return gate(x);
+  return "";
+}
+
+function triage(x) {
+  if (!x.findings.length) return `<p class="note">No findings to triage (did the Security reviewer stage write reports/findings.json?).</p>`;
+  const done = x.findings.filter(f => x.decisions[f.id]?.decision).length;
+  return `<p class="note">${done} of ${x.findings.length} decided. Your decisions are saved to reports/decisions.json. The agent never decides these.</p>` +
+    x.findings.map(f => {
+      const d = drafts[f.id] || x.decisions[f.id] || {};
+      const loc = f.location ? Object.entries(f.location).map(([k, v]) => `${k}: ${v}`).join(", ") : "";
+      return `<div class="finding ${x.decisions[f.id]?.decision ? "decided" : ""}">
+        <div class="row"><b class="sev-${esc(f.severity)}">${esc(f.severity)}</b><span class="chip">${esc(f.category)}</span>
+          <span class="chip">${f.reproducible ? "reproduced" : "not reproduced"}</span><span class="chip">agent says ${esc(f.disposition)}</span><b>${esc(f.id)}</b></div>
+        <div>${esc(f.title)}</div>
+        <details><summary class="note">Evidence, how to replay it, and the fix</summary>
+          <div class="label">Where</div><pre>${esc(loc)}</pre>
+          <div class="label">Evidence</div><pre>${esc(f.evidence)}</pre>
+          <div class="label">How to replay</div><pre>${esc(f.reproduction)}</pre>
+          <div class="label">Expected secure behaviour</div><pre>${esc(f.expected_secure_behaviour)}</pre>
+          <div class="label">Recommended fix</div><pre>${esc(f.recommended_fix)}</pre></details>
+        <div class="row" style="margin-top:8px">
+          <select data-f="${esc(f.id)}" data-k="decision">
+            <option value="">Decide…</option>
+            <option value="confirm" ${d.decision === "confirm" ? "selected" : ""}>Confirm: it's real</option>
+            <option value="false_positive" ${d.decision === "false_positive" ? "selected" : ""}>Dispute: false positive</option>
+            <option value="accept_risk" ${d.decision === "accept_risk" ? "selected" : ""}>Accept risk (owner + expiry)</option></select>
+          <input type="text" placeholder="Owner" data-f="${esc(f.id)}" data-k="owner" value="${esc(d.owner)}">
+          <input type="date" data-f="${esc(f.id)}" data-k="expires" value="${esc(d.expires)}">
+          <input type="text" placeholder="Note (why)" data-f="${esc(f.id)}" data-k="note" value="${esc(d.note)}">
+          <button data-save="${esc(f.id)}">Save</button></div></div>`;
+    }).join("");
+}
+
+function gate(x) {
+  return `<div class="rec rec-${esc(x.recommendation)}">${esc(x.recommendation)}</div><p class="note">${esc(x.note)}</p>
+    ${x.undecided.length ? `<p class="err">Still to decide in triage: ${x.undecided.map(esc).join(", ")}</p>` : ""}
+    ${x.block.length ? `<div class="label">Blocking</div><ul>${x.block.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
+    ${x.warn.length ? `<div class="label">Warnings</div><ul>${x.warn.map(r => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
+    ${x.signoff ? `<p class="st-pass">Signed off by ${esc(x.signoff.signed_by)} at ${esc(x.signoff.at)} (reports/signoff.json)</p>` :
+      `<div class="label">Sign off</div><div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
+        <input type="text" id="signer" placeholder="Your name" style="padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink)">
+        <input type="text" id="signnote" placeholder="Comment" style="flex:1;min-width:160px;padding:6px 8px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink)"></div>`}`;
+}
+
+function buttons(s, busy) {
+  const b = [];
+  if (s.id === "triage") {
+    if (["ready", "review"].includes(s.status)) b.push(`<button class="primary" data-act="accept" data-s="${s.id}">Triage done, continue</button>`);
+  } else if (s.id === "gate") {
+    if (["ready", "review"].includes(s.status)) b.push(`<button class="primary" data-act="accept" data-s="${s.id}">Sign off</button>`);
+  } else if (s.status === "ready") {
+    b.push(`<button class="primary" data-act="run" data-s="${s.id}" ${busy ? "disabled" : ""}>Approve &amp; run</button>`,
+           `<button data-act="skip" data-s="${s.id}">Skip</button>`);
+  } else if (s.status === "running") {
+    b.push(`<button class="danger" data-act="stop" data-s="${s.id}">Stop</button>`);
+  } else if (["review", "failed"].includes(s.status)) {
+    if (s.status === "review") b.push(`<button class="primary" data-act="accept" data-s="${s.id}">Result looks right, continue</button>`);
+    b.push(`<button data-act="run" data-s="${s.id}" ${busy ? "disabled" : ""}>Run again</button>`, `<button data-act="skip" data-s="${s.id}">Skip</button>`);
+  }
+  return b.length ? `<div class="btns">${b.join("")}</div>` : "";
+}
+
+function render(data) {
+  last = data;
+  document.getElementById("flow").innerHTML = data.stages.map((s, i) =>
+    `${i ? '<span class="arrow">→</span>' : ""}<span class="node s-${s.status}">${esc(s.agent)}</span>`).join("");
+  // keep what the user is typing: don't re-render a card whose inputs have focus
+  const focused = document.activeElement && document.activeElement.closest(".card");
+  if (focused && ["TEXTAREA", "INPUT", "SELECT"].includes(document.activeElement.tagName)) return;
+  document.getElementById("stages").innerHTML = data.stages.map((s, i) => {
+    const runnable = !["triage", "gate"].includes(s.id);
+    const elapsed = s.started ? Math.round(((s.ended || Date.now() / 1000) - s.started)) + " s" : "";
+    return `<section class="card ${s.status === "waiting" ? "locked" : ""}">
+      <div class="card-head"><span class="num">${i + 1}</span><h2>${esc(s.agent)}</h2><span class="chip">${esc(s.tool)}</span>
+        ${elapsed ? `<span class="chip">${elapsed}</span>` : ""}<span class="badge s-${s.status}">${STATUS[s.status] || s.status}</span></div>
+      <p class="what">${esc(s.what)}</p>
+      ${runnable && s.status !== "waiting" ? `<div class="label">Exactly what will run</div>${s.commands.map(c => `<div class="cmd">$ ${esc(c)}</div>`).join("")}` : ""}
+      ${s.id === "review" && ["ready", "review", "failed"].includes(s.status) ? `<div class="label">Prompt given to the agent (you can edit it)</div>
+        <textarea id="prompt">${esc(promptDraft ?? data.review_prompt)}</textarea>` : ""}
+      ${s.status !== "waiting" ? summary(s) : ""}
+      ${feed(s)}
+      ${buttons(s, data.busy)}
+    </section>`;
+  }).join("");
+  for (const s of data.stages) {  // keep the live feed scrolled to the newest line
+    const el = document.getElementById("feed-" + s.id);
+    if (el && s.status === "running") el.scrollTop = el.scrollHeight;
+  }
+}
+
+document.addEventListener("input", e => {
+  if (e.target.id === "prompt") promptDraft = e.target.value;
+  const f = e.target.dataset.f;
+  if (f) (drafts[f] ||= {...(last?.stages.find(s => s.id === "triage")?.summary?.decisions?.[f] || {})})[e.target.dataset.k] = e.target.value;
+});
+document.addEventListener("toggle", e => { if (e.target.dataset?.feed) openFeeds[e.target.dataset.feed] = e.target.open; }, true);
+document.addEventListener("click", async e => {
+  const t = e.target;
+  try {
+    if (t.dataset.save) {
+      await api("/api/decisions", {id: t.dataset.save, ...(drafts[t.dataset.save] || {})});
+      delete drafts[t.dataset.save];
+    } else if (t.dataset.act) {
+      const body = {};
+      if (t.dataset.act === "run" && t.dataset.s === "review") body.prompt = promptDraft ?? last.review_prompt;
+      if (t.dataset.act === "accept" && t.dataset.s === "gate") {
+        body.name = document.getElementById("signer")?.value || "";
+        body.comment = document.getElementById("signnote")?.value || "";
+        if (!body.name) throw new Error("Type your name to sign off.");
+      }
+      await api(`/api/stages/${t.dataset.s}/${t.dataset.act}`, body);
+    } else return;
+    document.getElementById("err").textContent = "";
+    document.activeElement?.blur();
+    refresh();
+  } catch (err) { document.getElementById("err").textContent = err.message; }
+});
+
+async function refresh() {
+  try { render(await api("/api/state")); document.getElementById("err").textContent = TOKEN ? "" : "No token: open the URL printed by server.py."; }
+  catch (err) { document.getElementById("err").textContent = err.message; }
+}
+refresh();
+setInterval(refresh, 1500);
+</script>
+</body>
+</html>

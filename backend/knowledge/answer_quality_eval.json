@@ -1,0 +1,25 @@
+{
+  "_about": "End-to-end RAG + LLM evaluation set. relevant_docs: chunks a good search should return (recall@k). needs_any: sources the agent must have used for the answer to be possible (retrieval check). must: every inner list needs one match in the answer. must_not: strings that make the answer wrong. Expected values were read from backend/var/cricket.sqlite3.",
+  "cases": [
+    {"q": "Who won IPL 2010?", "kind": "stats", "relevant_docs": ["season-2010"], "needs_any": ["tool:season_summary", "tool:team_titles", "doc:season-2010"], "must": [["Chennai Super Kings"]], "must_not": ["Mumbai Indians won"]},
+    {"q": "Which team won the 2016 IPL final?", "kind": "stats", "relevant_docs": ["season-2016"], "needs_any": ["tool:season_summary", "doc:season-2016"], "must": [["Sunrisers Hyderabad"]]},
+    {"q": "How many runs did Virat Kohli score in IPL 2016?", "kind": "stats", "relevant_docs": ["season-2016"], "needs_any": ["tool:get_player_stats", "doc:season-2016"], "must": [["973"]]},
+    {"q": "Did Deccan Chargers ever win the IPL?", "kind": "stats", "relevant_docs": ["team-deccan-chargers", "season-2009"], "needs_any": ["tool:team_titles", "doc:team-deccan-chargers", "doc:season-2009"], "must": [["2009"]], "must_not": ["2011"]},
+    {"q": "Have Royal Challengers Bangalore ever won the IPL?", "kind": "stats", "relevant_docs": ["team-royal-challengers-bangalore"], "needs_any": ["tool:team_titles", "doc:team-royal-challengers-bangalore"], "must": [["no", "not", "never", "none"]]},
+    {"q": "Who was player of the match in the 2017 final?", "kind": "stats", "relevant_docs": ["match-59"], "needs_any": ["tool:season_summary", "doc:match-59"], "must": [["KH Pandya", "Krunal Pandya"]]},
+    {"q": "How many wickets has Malinga taken in the IPL?", "kind": "stats", "relevant_docs": ["player-sl-malinga"], "needs_any": ["tool:get_player_stats", "doc:player-sl-malinga"], "must": [["154"]]},
+    {"q": "Who scored the most runs in IPL 2016?", "kind": "stats", "relevant_docs": ["season-2016"], "needs_any": ["tool:top_players", "tool:season_summary", "doc:season-2016"], "must": [["Kohli"]]},
+    {"q": "What happens after a no ball?", "kind": "rule", "relevant_docs": ["rule-no-ball-and-free-hit"], "needs_any": ["doc:rule-no-ball-and-free-hit"], "must": [["free hit"]]},
+    {"q": "How does a super over work?", "kind": "rule", "relevant_docs": ["rule-super-over"], "needs_any": ["doc:rule-super-over"], "must": [["one over", "super over"]]},
+    {"q": "When is a batter out lbw?", "kind": "rule", "relevant_docs": ["rule-leg-before-wicket-lbw"], "needs_any": ["doc:rule-leg-before-wicket-lbw"], "must": [["stumps"]]},
+    {"q": "What is DRS and how does it work?", "kind": "rule", "relevant_docs": ["rule-decision-review-system-drs"], "needs_any": ["doc:rule-decision-review-system-drs"], "must": [["review"]]},
+    {"q": "What's the score?", "kind": "live", "relevant_docs": [], "needs_any": ["live"], "must": []},
+    {"q": "Who won the toss in this match?", "kind": "live", "relevant_docs": [], "needs_any": ["live"], "must": [["Mumbai Indians"]]},
+    {"q": "Compare Virat Kohli and Rohit Sharma as IPL batsmen.", "kind": "explain", "relevant_docs": ["player-v-kohli", "player-rg-sharma"], "needs_any": ["tool:get_player_stats", "doc:player-v-kohli"], "must": [["4423"], ["4207"]]},
+    {"q": "Why is Malinga so effective in the IPL?", "kind": "explain", "relevant_docs": ["player-sl-malinga"], "needs_any": ["tool:get_player_stats", "doc:player-sl-malinga"], "must": []},
+    {"q": "Explain how Mumbai Indians won the 2017 IPL final.", "kind": "explain", "relevant_docs": ["match-59"], "needs_any": ["doc:match-59", "tool:season_summary"], "must": [["1 run", "one run"]]},
+    {"q": "Explain how Chennai Super Kings did in IPL 2010 and 2011.", "kind": "explain", "relevant_docs": ["season-2010", "season-2011", "team-chennai-super-kings"], "needs_any": ["tool:team_season_record", "tool:team_titles", "tool:season_summary", "doc:team-chennai-super-kings", "doc:season-2010"], "must": [["2010"], ["2011"]]},
+    {"q": "Who won IPL 2023?", "kind": "scope", "relevant_docs": [], "needs_any": [], "must": [["2008"]], "must_not": ["won IPL 2023"]},
+    {"q": "What is the capital of France?", "kind": "scope", "relevant_docs": [], "needs_any": [], "must": [["cricket"]], "must_not": ["Paris"]}
+  ]
+}

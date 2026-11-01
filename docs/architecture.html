@@ -1,0 +1,539 @@
+<title>Cricket Commentary Chatbot</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: broadcast scoreboard header, then one reading column with wide bands for the diagram and tables */
+:root {
+  --bg: #f5f7f3;
+  --surface: #ffffff;
+  --ink: #142019;
+  --ink-2: #44524a;
+  --ink-3: #7b877f;
+  --line: #d6ddd5;
+  --ball: #b0222f;       /* cricket-ball leather: LLM path, emphasis */
+  --ball-soft: #f6e3e4;
+  --pitch: #2f6b3f;      /* outfield green: live data path */
+  --pitch-soft: #e2eee4;
+  --board: #10241a;      /* scoreboard */
+  --board-ink: #f1f5ef;
+  --board-dim: #9fb4a6;
+  --amber: #b26a00;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1511; --surface: #151f19; --ink: #e6ede7; --ink-2: #b2bfb5; --ink-3: #7f8d84;
+    --line: #2a3830; --ball: #ec6a74; --ball-soft: #3a1c20; --pitch: #6fbf84; --pitch-soft: #183022;
+    --board: #08100c; --board-ink: #eef4ef; --board-dim: #8fa598; --amber: #e3a246;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1511; --surface: #151f19; --ink: #e6ede7; --ink-2: #b2bfb5; --ink-3: #7f8d84;
+  --line: #2a3830; --ball: #ec6a74; --ball-soft: #3a1c20; --pitch: #6fbf84; --pitch-soft: #183022;
+  --board: #08100c; --board-ink: #eef4ef; --board-dim: #8fa598; --amber: #e3a246;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+
+.board { background: var(--board); color: var(--board-ink); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.board .wrap { padding-block: 36px 28px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--board-dim); }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(38px, 6vw, 60px); line-height: 1; margin: 10px 0 12px; letter-spacing: .01em; text-wrap: balance; }
+.lede { max-width: 64ch; color: var(--board-dim); margin: 0; }
+.fixture { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; margin-top: 22px; font-family: var(--display); font-size: 22px; font-weight: 600; letter-spacing: .03em; }
+.fixture .vs { color: var(--board-dim); font-size: 16px; }
+.fixture .tag { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--board-dim); color: var(--board-dim); padding: 2px 8px; border-radius: 3px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: #ffffff1a; margin-top: 24px; border-radius: 4px; overflow: hidden; }
+.stat { background: var(--board); padding: 14px 16px; min-width: 0; }
+.stat b { display: block; font-family: var(--mono); font-weight: 500; font-size: 26px; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.stat span { font-size: 12.5px; color: var(--board-dim); }
+
+main .wrap { padding-block: 8px 64px; }
+section { padding-top: 44px; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 30px; line-height: 1.1; letter-spacing: .01em; margin: 0 0 6px; text-wrap: balance; }
+h2 small { font-family: var(--mono); font-size: 12px; font-weight: 400; color: var(--ink-3); letter-spacing: .06em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+h3 { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+p { max-width: 70ch; margin: 0 0 12px; }
+.muted { color: var(--ink-2); }
+code, .mono { font-family: var(--mono); font-size: .9em; }
+
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 16px; }
+.principle { border-top: 3px solid var(--ink); padding-top: 10px; min-width: 0; }
+.principle p { font-size: 14px; color: var(--ink-2); margin: 0; }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; margin-top: 16px; }
+.cols > * { min-width: 0; }
+ul.ticks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.ticks li { padding-left: 20px; position: relative; }
+ul.ticks li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 8px; height: 8px; border-radius: 50%; background: var(--ball); }
+ul.ticks.green li::before { background: var(--pitch); }
+
+.tbl { overflow-x: auto; margin-top: 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.total td { font-weight: 600; background: var(--pitch-soft); }
+tr.naive td { color: var(--ball); }
+
+.diagram { margin-top: 16px; overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+.diagram svg { display: block; width: 100%; min-width: 960px; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13px; color: var(--ink-2); margin-top: 10px; }
+.legend i { display: inline-block; width: 22px; height: 0; border-top: 2px solid var(--ink-3); vertical-align: middle; margin-right: 6px; }
+.legend i.hot { border-color: var(--ball); }
+.legend i.live { border-color: var(--pitch); }
+.legend i.dash { border-top-style: dashed; }
+
+svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+svg .box-hot { fill: var(--ball-soft); stroke: var(--ball); stroke-width: 1.5; }
+svg .box-live { fill: var(--pitch-soft); stroke: var(--pitch); stroke-width: 1.5; }
+svg .box-ghost { fill: var(--surface); stroke: var(--ink-3); stroke-width: 1.2; stroke-dasharray: 5 4; }
+svg .t { fill: var(--ink); font-family: var(--body); font-size: 14px; font-weight: 600; }
+svg .s { fill: var(--ink-2); font-family: var(--body); font-size: 11.5px; }
+svg .m { fill: var(--ink-2); font-family: var(--mono); font-size: 11.5px; }
+svg .big { fill: var(--ball); font-family: var(--mono); font-size: 26px; font-weight: 500; }
+svg .lane { fill: var(--ink-3); font-family: var(--mono); font-size: 11px; letter-spacing: .08em; }
+svg .lbl { fill: var(--ink-3); font-family: var(--mono); font-size: 10.5px; }
+svg .e { fill: none; stroke: var(--ink-3); stroke-width: 1.6; }
+svg .e-hot { fill: none; stroke: var(--ball); stroke-width: 2; }
+svg .e-live { fill: none; stroke: var(--pitch); stroke-width: 2; }
+svg .e-dash { stroke-dasharray: 5 4; }
+svg .ah { fill: var(--ink-3); }
+svg .ah-hot { fill: var(--ball); }
+svg .ah-live { fill: var(--pitch); }
+svg .rule { stroke: var(--line); stroke-width: 1; }
+
+ol.flow { padding-left: 0; list-style: none; counter-reset: f; display: grid; gap: 10px; margin: 16px 0 0; max-width: 78ch; }
+ol.flow li { counter-increment: f; display: grid; grid-template-columns: 32px 1fr; gap: 10px; }
+ol.flow li::before { content: counter(f); font-family: var(--mono); font-size: 13px; color: var(--ball); border: 1.5px solid var(--ball); border-radius: 50%; width: 26px; height: 26px; display: grid; place-items: center; margin-top: 1px; }
+
+.funnel { display: grid; gap: 8px; margin-top: 14px; max-width: 760px; }
+.frow { display: grid; grid-template-columns: minmax(130px, 200px) 1fr; gap: 12px; align-items: center; font-size: 13.5px; }
+.frow .bar { height: 26px; background: var(--line); border-radius: 3px; position: relative; }
+.frow .bar span { position: absolute; inset: 0 auto 0 0; background: var(--ink-2); border-radius: 3px; display: flex; align-items: center; padding-left: 8px; color: var(--surface); font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+.frow .bar span.hot { background: var(--ball); }
+.frow .bar span.live { background: var(--pitch); }
+
+.ladder { display: grid; gap: 0; margin-top: 14px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.rung { display: grid; grid-template-columns: 64px 1fr; border-bottom: 1px solid var(--line); }
+.rung:last-child { border-bottom: 0; }
+.rung b { font-family: var(--mono); font-weight: 500; font-size: 13px; display: grid; place-items: center; border-right: 1px solid var(--line); }
+.rung div { padding: 10px 14px; font-size: 14px; min-width: 0; }
+.rung div em { font-style: normal; color: var(--ink-3); font-size: 12.5px; display: block; }
+.rung.l0 b { color: var(--pitch); } .rung.l1 b, .rung.l2 b { color: var(--amber); } .rung.l3 b, .rung.l4 b { color: var(--ball); }
+
+.note { border-left: 3px solid var(--amber); padding: 8px 14px; background: var(--surface); font-size: 13.5px; color: var(--ink-2); max-width: 78ch; margin-top: 14px; }
+footer { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 18px; font-size: 13px; color: var(--ink-3); }
+</style>
+
+<header class="board">
+  <div class="wrap">
+    <div class="eyebrow">Workshop part 1 · Shape it</div>
+    <h1>Cricket Commentary Chatbot</h1>
+    <p class="lede">Fans ask questions about a live match and get streamed answers grounded in the ball-by-ball feed. This is the design for the hardest night of the year: the India vs Pakistan final.</p>
+    <div class="fixture"><span>IND</span><span class="vs">vs</span><span>PAK</span><span class="tag">Final · T20</span><span class="tag">Feed update every 2–5 s</span></div>
+    <div class="stats">
+      <div class="stat"><b>5M</b><span>fans joining within 10 min</span></div>
+      <div class="stat"><b>16.7K/s</b><span>peak questions</span></div>
+      <div class="stat"><b>4.6K/s</b><span>peak Claude calls (27.5%)</span></div>
+      <div class="stat"><b>≤ 3 s</b><span>ball to fan screen, p95</span></div>
+      <div class="stat"><b>~$9.1K</b><span>tokens per match, all-in</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+<section id="principles">
+  <h2><small>The four bets</small>Design principles</h2>
+  <div class="principles">
+    <div class="principle"><h3>Numbers from state, words from the model</h3><p>Scores, overs and run rates are read from the match state and passed to Claude. The model explains; it never recalls a number.</p></div>
+    <div class="principle"><h3>Most questions never reach the LLM</h3><p>"What's the score?" is answered from a template in under 100 ms. Repeated questions hit a cache keyed by state version.</p></div>
+    <div class="principle"><h3>One shared prompt prefix per ball</h3><p>Every fan's prompt starts with the same system text and the same match snapshot, so prompt caching serves ~78% of input tokens.</p></div>
+    <div class="principle"><h3>The kickoff time is known</h3><p>The toss is at a published time. Capacity is pre-scaled 30 minutes before, instead of waiting for autoscalers to react.</p></div>
+  </div>
+</section>
+
+<section id="requirements">
+  <h2><small>Deliverable 1</small>Requirements</h2>
+  <div class="cols">
+    <div>
+      <h3>Functional</h3>
+      <ul class="ticks">
+        <li>Ask about the live match in plain language: score, situation, players, rules ("why was that not out?").</li>
+        <li>Streamed answers with an "as of over 14.3" stamp on every live figure.</li>
+        <li>Follow-up questions keep context ("and his strike rate?").</li>
+        <li>Live ticker plus auto commentary for every delivery.</li>
+        <li>Stats questions: head-to-head, career figures, venue records.</li>
+        <li>Situation maths: required run rate, par score, projected total, computed by tools and explained by the model.</li>
+        <li>English, Hindi, Urdu and Hinglish.</li>
+        <li>Suggested question chips that change with the game state.</li>
+        <li>Thumbs up/down and report abuse.</li>
+      </ul>
+      <p class="muted" style="margin-top:12px;font-size:13.5px">Out of scope: betting or fantasy tips, video clips, payments.</p>
+    </div>
+    <div>
+      <h3>Non-functional</h3>
+      <div class="tbl" style="margin-top:0">
+        <table>
+          <thead><tr><th>Quality</th><th>Target</th></tr></thead>
+          <tbody>
+            <tr><td>Scale</td><td>5M concurrent; 0 → 5M in 10 min (8.3K joins/s avg, design for 25K/s)</td></tr>
+            <tr><td>Freshness</td><td>Feed → state ≤ 1 s; state → fan screen ≤ 3 s p95</td></tr>
+            <tr><td>Latency</td><td>Template answer p95 &lt; 300 ms; Claude first token p95 &lt; 1.5 s; full answer &lt; 4 s</td></tr>
+            <tr><td>Availability</td><td>99.95% in the match window, about 6 s of allowed downtime in 3.5 h</td></tr>
+            <tr><td>Accuracy</td><td>Every figure matches the state version it cites; nothing older than 10 s served as live</td></tr>
+            <tr><td>Cost</td><td>&lt; $0.005 per fan per match (estimate: $0.0018)</td></tr>
+            <tr><td>Safety</td><td>Rivalry abuse and hate filtered in and out; no betting advice</td></tr>
+            <tr><td>Privacy</td><td>India DPDP Act 2023: minimal PII, 30-day log retention</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="design">
+  <h2><small>Deliverable 2</small>High-level design</h2>
+  <p class="muted">Three planes. The request path answers questions. The live data path turns the feed into one versioned match state. The ticker never touches app servers: the CDN serves it.</p>
+  <div class="diagram">
+    <svg viewBox="0 0 1240 630" role="img" aria-label="Architecture: fan apps connect through a WAF and API gateway to a chat orchestrator, which calls an LLM gateway in front of Claude Haiku 5.5 and Sonnet 5.5. A feed ingestion pipeline through Kafka and a state builder writes the match state store that the orchestrator and CDN read.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-hot" d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="ahl" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah-live" d="M0,0 L10,5 L0,10 z"/></marker>
+      </defs>
+
+      <text class="lane" x="20" y="52">REQUEST PATH</text>
+      <text class="lane" x="1090" y="58">CLAUDE</text>
+      <line class="rule" x1="20" y1="296" x2="1225" y2="296"/>
+      <text class="lane" x="20" y="316">STATE + CACHES</text>
+      <line class="rule" x1="20" y1="458" x2="1225" y2="458"/>
+      <text class="lane" x="20" y="474">LIVE DATA PATH</text>
+
+      <!-- Row 1: request path -->
+      <rect class="box" x="20" y="90" width="150" height="140" rx="6"/>
+      <text class="t" x="95" y="124" text-anchor="middle">Fan apps</text>
+      <text class="s" x="95" y="144" text-anchor="middle">web · Android · iOS</text>
+      <text class="big" x="95" y="190" text-anchor="middle">5M</text>
+      <text class="s" x="95" y="212" text-anchor="middle">in 10 minutes</text>
+
+      <rect class="box" x="210" y="100" width="180" height="70" rx="6"/>
+      <text class="t" x="300" y="128" text-anchor="middle">WAF + DDoS shield</text>
+      <text class="s" x="300" y="150" text-anchor="middle">bot score · IP/device limits</text>
+
+      <rect class="box" x="430" y="100" width="170" height="70" rx="6"/>
+      <text class="t" x="515" y="128" text-anchor="middle">API gateway</text>
+      <text class="s" x="515" y="150" text-anchor="middle">JWT · per-user quota · SSE</text>
+
+      <rect class="box-hot" x="640" y="70" width="200" height="160" rx="6"/>
+      <text class="t" x="740" y="96" text-anchor="middle">Chat orchestrator</text>
+      <text class="m" x="656" y="124">1  moderate + intent</text>
+      <text class="m" x="656" y="146">2  template answer</text>
+      <text class="m" x="656" y="168">3  semantic cache</text>
+      <text class="m" x="656" y="190">4  coalesce + prompt</text>
+      <text class="m" x="656" y="212">5  check numbers</text>
+
+      <rect class="box-hot" x="880" y="70" width="170" height="160" rx="6"/>
+      <text class="t" x="965" y="96" text-anchor="middle">LLM gateway</text>
+      <text class="m" x="896" y="124">model router</text>
+      <text class="m" x="896" y="146">circuit breakers</text>
+      <text class="m" x="896" y="168">token budgets</text>
+      <text class="m" x="896" y="190">per-ball pre-warm</text>
+      <text class="m" x="896" y="212">platform failover</text>
+
+      <rect class="box-hot" x="1090" y="70" width="135" height="66" rx="6"/>
+      <text class="t" x="1157" y="98" text-anchor="middle">Haiku 5.5</text>
+      <text class="s" x="1157" y="118" text-anchor="middle">~90% of calls</text>
+      <rect class="box-hot" x="1090" y="148" width="135" height="66" rx="6"/>
+      <text class="t" x="1157" y="176" text-anchor="middle">Sonnet 5.5</text>
+      <text class="s" x="1157" y="196" text-anchor="middle">analysis · ~10%</text>
+      <rect class="box-ghost" x="1090" y="226" width="135" height="54" rx="6"/>
+      <text class="t" x="1157" y="249" text-anchor="middle" style="font-size:12.5px">Fallback platform</text>
+      <text class="s" x="1157" y="267" text-anchor="middle">Bedrock / Vertex</text>
+
+      <path class="e" d="M170,135 L206,135" marker-end="url(#ah)"/>
+      <path class="e" d="M390,135 L426,135" marker-end="url(#ah)"/>
+      <path class="e" d="M600,135 L636,135" marker-end="url(#ah)"/>
+      <path class="e-hot" d="M840,150 L876,150" marker-end="url(#ahh)"/>
+      <path class="e-hot" d="M1050,103 L1086,103" marker-end="url(#ahh)"/>
+      <path class="e-hot" d="M1050,181 L1086,181" marker-end="url(#ahh)"/>
+      <path class="e-hot e-dash" d="M1050,218 L1068,218 L1068,253 L1086,253" marker-end="url(#ahh)"/>
+
+      <!-- Row 2: state + caches -->
+      <rect class="box" x="210" y="330" width="180" height="70" rx="6"/>
+      <text class="t" x="300" y="358" text-anchor="middle">CDN edge cache</text>
+      <text class="m" x="300" y="380" text-anchor="middle">score.json · TTL 2s</text>
+
+      <rect class="box" x="430" y="330" width="170" height="70" rx="6"/>
+      <text class="t" x="515" y="358" text-anchor="middle">Redis cluster</text>
+      <text class="s" x="515" y="380" text-anchor="middle">sessions · answer cache</text>
+
+      <rect class="box-live" x="640" y="330" width="200" height="70" rx="6"/>
+      <text class="t" x="740" y="358" text-anchor="middle">Match state store</text>
+      <text class="s" x="740" y="380" text-anchor="middle">versioned snapshot + pub/sub</text>
+
+      <rect class="box" x="880" y="330" width="170" height="70" rx="6"/>
+      <text class="t" x="965" y="358" text-anchor="middle">Stats DB</text>
+      <text class="s" x="965" y="380" text-anchor="middle">Postgres + pgvector</text>
+
+      <rect class="box" x="1090" y="330" width="135" height="70" rx="6"/>
+      <text class="t" x="1157" y="358" text-anchor="middle">Telemetry</text>
+      <text class="s" x="1157" y="380" text-anchor="middle">OTel · $/min meter</text>
+
+      <path class="e" d="M150,230 L150,365 L206,365" marker-end="url(#ah)"/>
+      <text class="lbl" x="156" y="385">poll 2s</text>
+      <path class="e" d="M660,230 L660,276 L515,276 L515,326" marker-end="url(#ah)"/>
+      <path class="e" d="M740,230 L740,326" marker-end="url(#ah)"/>
+      <path class="e" d="M820,230 L820,276 L965,276 L965,326" marker-end="url(#ah)"/>
+
+      <!-- Row 3: live data path -->
+      <rect class="box-live" x="20" y="490" width="150" height="70" rx="6"/>
+      <text class="t" x="95" y="518" text-anchor="middle">Feed providers</text>
+      <text class="s" x="95" y="540" text-anchor="middle">primary + backup</text>
+
+      <rect class="box-live" x="210" y="490" width="180" height="70" rx="6"/>
+      <text class="t" x="300" y="518" text-anchor="middle">Ingest adapters</text>
+      <text class="s" x="300" y="540" text-anchor="middle">HMAC · dedupe · order</text>
+
+      <rect class="box-live" x="430" y="490" width="170" height="70" rx="6"/>
+      <text class="t" x="515" y="518" text-anchor="middle">Kafka</text>
+      <text class="m" x="515" y="540" text-anchor="middle">match-events</text>
+
+      <rect class="box-live" x="640" y="490" width="200" height="70" rx="6"/>
+      <text class="t" x="740" y="518" text-anchor="middle">State builder</text>
+      <text class="s" x="740" y="540" text-anchor="middle">one writer per match</text>
+
+      <rect class="box-hot" x="880" y="490" width="170" height="70" rx="6"/>
+      <text class="t" x="965" y="518" text-anchor="middle">Commentary writer</text>
+      <text class="s" x="965" y="540" text-anchor="middle">Sonnet 5.5 · per ball</text>
+
+      <rect class="box" x="1090" y="490" width="135" height="70" rx="6"/>
+      <text class="t" x="1157" y="518" text-anchor="middle">Data lake</text>
+      <text class="s" x="1157" y="540" text-anchor="middle">logs · eval replays</text>
+
+      <path class="e-live" d="M170,525 L206,525" marker-end="url(#ahl)"/>
+      <path class="e-live" d="M390,525 L426,525" marker-end="url(#ahl)"/>
+      <path class="e-live" d="M600,525 L636,525" marker-end="url(#ahl)"/>
+      <path class="e-live" d="M840,525 L876,525" marker-end="url(#ahl)"/>
+      <path class="e-live" d="M760,490 L760,404" marker-end="url(#ahl)"/>
+      <text class="lbl" x="766" y="452">new version</text>
+      <path class="e-live" d="M965,490 L965,446 L820,446 L820,404" marker-end="url(#ahl)"/>
+      <path class="e" d="M300,400 L300,430 L700,430 L700,404" marker-end="url(#ah)"/>
+      <text class="lbl" x="440" y="424">origin pull · ~1 req/s per POP</text>
+      <path class="e" d="M515,560 L515,596 L1157,596 L1157,564" marker-end="url(#ah)"/>
+      <text class="lbl" x="760" y="614">chat + event logs → lake</text>
+    </svg>
+  </div>
+  <div class="legend">
+    <span><i class="hot"></i>LLM path</span>
+    <span><i class="live"></i>live data path</span>
+    <span><i></i>reads, caches, logs</span>
+    <span><i class="hot dash"></i>failover</span>
+  </div>
+
+  <h3 style="margin-top:26px">One question, end to end</h3>
+  <ol class="flow">
+    <li><div>The app sends the question over HTTPS to the edge. The WAF drops bots; the gateway checks the device token and the user's quota (30 questions per 10 min).</div></li>
+    <li><div>The orchestrator runs moderation and intent classification in one cheap pass and normalises the text ("scor?" → <code>score</code>).</div></li>
+    <li><div>About 45% of questions are factual lookups (score, who's batting, required rate). They are filled from a template using the in-memory match state. No LLM.</div></li>
+    <li><div>The rest check the answer cache, keyed by <code>match · state version · language · normalised question</code>. Half hit.</div></li>
+    <li><div>On a miss, identical in-flight questions are coalesced so one Claude call serves all of them. The prompt is built as: system text, match snapshot (both cached), retrieved stats, last 3 turns, question.</div></li>
+    <li><div>The LLM gateway routes to Haiku 5.5, or to Sonnet 5.5 for analysis and "why" questions, and streams tokens back.</div></li>
+    <li><div>A validator checks every number in the answer against the snapshot. On a mismatch the fan gets the template answer, and the case is logged for evaluation.</div></li>
+    <li><div>The answer streams to the fan with its "as of over" stamp, is written to the cache, and is logged to Kafka.</div></li>
+  </ol>
+</section>
+
+<section id="capacity">
+  <h2><small>Deliverable 3</small>Capacity estimate</h2>
+  <p class="muted">Assumptions: 5M concurrent fans. 20% (1M) chat. Each chatter asks once every 3 min on average and once a minute at peak. A wicket or six triples traffic for about 30 s. T20 match window is 3.5 h (12,600 s).</p>
+
+  <h3 style="margin-top:18px">Peak question funnel (per second)</h3>
+  <div class="funnel">
+    <div class="frow"><span>Questions in</span><div class="bar"><span style="width:100%">16.7K</span></div></div>
+    <div class="frow"><span>After templates (−45%)</span><div class="bar"><span style="width:55%">9.2K</span></div></div>
+    <div class="frow"><span>After answer cache (−50%)</span><div class="bar"><span class="hot" style="width:27.5%">4.6K</span></div></div>
+    <div class="frow"><span>To Sonnet 5.5 (10%)</span><div class="bar"><span class="hot" style="width:2.75%;min-width:46px">0.46K</span></div></div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Component</th><th class="n">Steady</th><th class="n">Peak</th><th>How we got there · what we provision</th></tr></thead>
+      <tbody>
+        <tr><td>New sessions</td><td class="n">8.3K/s</td><td class="n">25K/s</td><td>5M ÷ 600 s; 3× for the toss. Signed device tokens, no DB write on join.</td></tr>
+        <tr><td>Ticker polls (CDN)</td><td class="n">2.5M/s</td><td class="n">2.5M/s</td><td>5M ÷ 2 s. ETag means ~80% are 304s, about 9 Gbps edge egress. Origin sees ~1 req/s per POP.</td></tr>
+        <tr><td>Questions</td><td class="n">5.6K/s</td><td class="n">16.7K/s</td><td>1M ÷ 180 s and 1M ÷ 60 s. Burst on a wicket: 50K/s for ~30 s.</td></tr>
+        <tr><td>Claude calls</td><td class="n">1.5K/s</td><td class="n">4.6K/s</td><td>27.5% of questions. Admission control caps bursts at 6K/s; the rest get template or cached answers.</td></tr>
+        <tr><td>Claude tokens</td><td class="n">4.4M/s in</td><td class="n">13.5M/s in</td><td>2,940 input (78% cache reads) and 150 output per call; peak output 690K tok/s. Needs provisioned limits across two platforms.</td></tr>
+        <tr><td>Concurrent LLM streams</td><td class="n">3.8K</td><td class="n">11.5K</td><td>Calls/s × ~2.5 s stream time.</td></tr>
+        <tr><td>Open SSE streams</td><td class="n">12K</td><td class="n">35K</td><td>~10K per gateway pod → run 12 pods over 2 regions (3× headroom).</td></tr>
+        <tr><td>Orchestrator pods</td><td class="n">4</td><td class="n">12</td><td>~1.5K q/s per async pod. Pre-scale to 40 for wicket bursts.</td></tr>
+        <tr><td>Redis</td><td class="n">17K ops/s</td><td class="n">150K ops/s</td><td>3 ops per question. 1M sessions × 2 KB = 2 GB. 6 shards, 1 replica each.</td></tr>
+        <tr><td>Feed events</td><td class="n">~1/s</td><td class="n">~5/s</td><td>Tiny. One Kafka partition per match keeps ordering.</td></tr>
+        <tr><td>Log storage</td><td class="n">—</td><td class="n">70 GB/match</td><td>70M questions × 1 KB to the lake, 30-day retention.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="cost">
+  <h2><small>Deliverable 4</small>Token cost estimate</h2>
+  <p class="muted">70M questions in the match (1M chatters × 70). 19.25M reach Claude: 17.3M on Haiku 5.5, 1.9M on Sonnet 5.5. Chat calls run with thinking off or at low effort so output stays near 150 tokens.</p>
+  <div class="cols">
+    <div>
+      <h3>Tokens per Claude call</h3>
+      <div class="tbl" style="margin-top:0">
+        <table>
+          <thead><tr><th>Part</th><th class="n">Tokens</th><th>Billing</th></tr></thead>
+          <tbody>
+            <tr><td>System prompt + tool definitions</td><td class="n">800</td><td>cache read</td></tr>
+            <tr><td>Match snapshot (changes per ball)</td><td class="n">1,500</td><td>cache read</td></tr>
+            <tr><td>Retrieved stats</td><td class="n">300</td><td>input</td></tr>
+            <tr><td>Last 3 turns</td><td class="n">300</td><td>input</td></tr>
+            <tr><td>Question</td><td class="n">40</td><td>input</td></tr>
+            <tr><td>Answer</td><td class="n">150</td><td>output</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <h3>Cost per call</h3>
+      <div class="tbl" style="margin-top:0">
+        <table>
+          <thead><tr><th>Model ($/MTok in · cache · out)</th><th class="n">Per call</th></tr></thead>
+          <tbody>
+            <tr><td>Haiku 5.5 ($0.10 · $0.01 · $0.50)</td><td class="n">$0.000162</td></tr>
+            <tr><td>Sonnet 5.5 ($2.00 · $0.20 · $10.00)</td><td class="n">$0.00324</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted" style="font-size:13px;margin-top:10px">Haiku: 2,300 × $0.01 + 640 × $0.10 + 150 × $0.50, per million. Cache writes cost 1.25× input; the snapshot is rewritten once per ball per model, which adds about $20 per match.</p>
+    </div>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Line item</th><th class="n">Calls</th><th class="n">Cost / match</th></tr></thead>
+      <tbody>
+        <tr><td>Haiku 5.5 chat answers</td><td class="n">17.3M</td><td class="n">$2,810</td></tr>
+        <tr><td>Sonnet 5.5 analysis answers</td><td class="n">1.9M</td><td class="n">$6,240</td></tr>
+        <tr><td>Snapshot cache writes</td><td class="n">~2.6K</td><td class="n">~$20</td></tr>
+        <tr><td>Auto commentary (260 balls × 3 languages, Sonnet 5.5)</td><td class="n">780</td><td class="n">~$5</td></tr>
+        <tr class="total"><td>Total</td><td class="n">19.25M</td><td class="n">≈ $9,075</td></tr>
+        <tr><td>Per fan (5M) · per 1K questions (70M)</td><td class="n"></td><td class="n">$0.0018 · $0.13</td></tr>
+        <tr class="naive"><td>Naive: every question to Sonnet 5.5, no cache</td><td class="n">70M</td><td class="n">≈ $516,600</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Sonnet is 10% of calls but 69% of spend. Cutting its share to 5% with a better router saves about $3,100 per match. Prices are from Anthropic's published list as of October 2026; confirm them and our rate limits with the account team before the final.</p>
+</section>
+
+<section id="qualities">
+  <h2><small>Cross-cutting</small>Scalability, security, failure, maintainability</h2>
+  <div class="cols">
+    <div>
+      <h3>Scalability</h3>
+      <ul class="ticks green">
+        <li>Stateless gateway and orchestrator pods scale sideways; all state lives in Redis and Kafka.</li>
+        <li>The CDN absorbs the 2.5M/s ticker load, so a viral moment does not reach app servers.</li>
+        <li>Everything is partitioned by <code>match_id</code> (Kafka key, Redis hash tag), so a parallel match never shares a hot shard.</li>
+        <li>Orchestrators subscribe to state changes and hold the snapshot in memory: zero reads per question.</li>
+        <li>Scheduled pre-scale 30 min before the toss; KEDA on queue depth for the rest.</li>
+        <li>Active-active in two Indian regions behind GeoDNS.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Security</h3>
+      <ul class="ticks">
+        <li>Edge WAF, DDoS shield and bot scoring; TLS 1.3; rate limits by IP, device and user.</li>
+        <li>Anonymous signed device token (24 h), upgradable to login. A daily token budget per user stops cost abuse.</li>
+        <li>Prompt injection: fixed system prompt, user text only in the user turn, read-only tools scoped to one match, no secrets or other users' data in context.</li>
+        <li>Input and output moderation tuned for rivalry abuse, communal hate and player harassment; betting tips refused.</li>
+        <li>HMAC-signed feed, schema checks and sanity rules (runs never fall except a flagged correction).</li>
+        <li>API keys in a vault, held only by the LLM gateway; mTLS inside; least-privilege IAM.</li>
+        <li>Pseudonymised logs, 30-day retention, delete on request (DPDP Act 2023).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin-top:28px">Failure handling</h3>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Failure</th><th>How we detect it</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>Primary feed stalls</td><td>No heartbeat for 10 s, sequence gap</td><td>Switch to backup provider. UI shows "last ball 14.3, 12 s ago".</td></tr>
+        <tr><td>Duplicate, late or corrected ball</td><td>Per-delivery sequence numbers</td><td>State builder is idempotent; a correction becomes a new version, which retires cached answers.</td></tr>
+        <tr><td>Claude 429, 5xx or slow</td><td>Circuit breaker per model and platform</td><td>Fail over to the second platform, Sonnet → Haiku, then step down the ladder below.</td></tr>
+        <tr><td>Wicket stampede</td><td>Questions/s triples within seconds</td><td>Coalescing, admission control, chips promoted over free text.</td></tr>
+        <tr><td>Model states a wrong number</td><td>Validator against the snapshot</td><td>Template answer served; case goes to the eval set.</td></tr>
+        <tr><td>Redis node lost</td><td>Cluster health</td><td>Replica promoted; orchestrators keep the last snapshot in memory.</td></tr>
+        <tr><td>Region lost</td><td>GeoDNS health checks</td><td>Traffic moves to the other region; chat history may reset.</td></tr>
+        <tr><td>Client retry storm</td><td>Error-rate spike from one app version</td><td>Jittered backoff in the app, <code>Retry-After</code> from the gateway.</td></tr>
+        <tr><td>Cold prompt cache after each ball</td><td><code>cache_creation_input_tokens</code> spike</td><td>Gateway pre-warms the new snapshot with a <code>max_tokens: 0</code> call.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 style="margin-top:28px">Degrade ladder</h3>
+  <p class="muted" style="font-size:14px">Each level is a feature flag, switched automatically on latency and error thresholds or by the on-call engineer.</p>
+  <div class="ladder">
+    <div class="rung l0"><b>L0</b><div>Normal service<em>All paths on.</em></div></div>
+    <div class="rung l1"><b>L1</b><div>Shorter answers, Haiku only<em>Claude first-token p95 over 3 s or 429s above 1%.</em></div></div>
+    <div class="rung l2"><b>L2</b><div>Cache matches across the last 2 ball versions; chips only, no free text<em>Questions above 30K/s.</em></div></div>
+    <div class="rung l3"><b>L3</b><div>Claude off: templates, cached answers and latest commentary<em>Both platforms failing.</em></div></div>
+    <div class="rung l4"><b>L4</b><div>Ticker only from the CDN<em>App tier down. The score keeps updating.</em></div></div>
+  </div>
+
+  <h3 style="margin-top:28px">Maintainability</h3>
+  <ul class="ticks green" style="max-width:78ch">
+    <li>Small services with one job each, and a versioned schema registry for ball events.</li>
+    <li>Prompts and model settings live in a versioned registry and ship through a 5% canary gated by evals.</li>
+    <li>A replay harness re-runs past India–Pakistan feeds at 10× speed, for load tests and answer quality.</li>
+    <li>Golden set of about 500 questions with expected facts per match state, run in CI.</li>
+    <li>OpenTelemetry traces across every hop. Dashboards for feed lag, first-token time, cache hit rate, tokens/min and $/min.</li>
+    <li>Terraform for infrastructure and a runbook for every ladder level.</li>
+  </ul>
+</section>
+
+<section id="stack">
+  <h2><small>Choices</small>Technology</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Layer</th><th>Choice</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Edge</td><td>CloudFront or Cloudflare with WAF</td><td>Micro-caching, DDoS protection, POPs across South Asia and the diaspora</td></tr>
+        <tr><td>Gateway</td><td>Envoy</td><td>Long-lived SSE streams, JWT checks, local rate limiting</td></tr>
+        <tr><td>Orchestrator, LLM gateway</td><td>Async service (Python FastAPI or Go)</td><td>I/O bound; decided at implementation</td></tr>
+        <tr><td>Models</td><td>Claude Haiku 5.5, Claude Sonnet 5.5</td><td>Cheap fast default, stronger model for analysis</td></tr>
+        <tr><td>Events</td><td>Kafka</td><td>Ordered per match, replayable for evals</td></tr>
+        <tr><td>State, cache, sessions</td><td>Redis Cluster</td><td>Sub-millisecond reads, pub/sub for state versions</td></tr>
+        <tr><td>Stats</td><td>Postgres + pgvector</td><td>Structured stats plus retrieval over notes and rules</td></tr>
+        <tr><td>Platform</td><td>Kubernetes, KEDA, Terraform</td><td>Scheduled and queue-based scaling</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="next">
+  <h2><small>Part 2</small>Build order</h2>
+  <ol class="flow">
+    <li><div>Feed simulator that replays a real match, plus the state builder and match state store.</div></li>
+    <li><div>Chat API with SSE, intent routing and template answers.</div></li>
+    <li><div>LLM gateway with Claude, prompt caching and the number validator.</div></li>
+    <li><div>Answer cache, coalescing, quotas and moderation.</div></li>
+    <li><div>Load test with the replay harness, then wire up the degrade ladder.</div></li>
+  </ol>
+  <footer>Cricket Commentary Chatbot · architecture v1 · October 2026</footer>
+</section>
+
+</div>
+</main>

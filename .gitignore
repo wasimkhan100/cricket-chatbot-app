@@ -1,0 +1,25 @@
+backend/.env
+backend/var/
+backend/.venv/
+**/__pycache__/
+frontend/node_modules/
+frontend/dist/
+Cricket-data/__MACOSX/
+*.log
+
+# Machine-specific and editor files
+.idea/
+.claude/settings.local.json
+**/.~lock.*#
+
+# Duplicate of Cricket-data/
+Cricket-data.zip
+
+# Security reviewer: third-party clones (re-clone with security-reviewer/vendor/SOURCES.md) and local run outputs
+security-reviewer/vendor/*/
+security-reviewer/reports/*
+!security-reviewer/reports/findings.schema.json
+!security-reviewer/reports/README.md
+
+# Built from paid course material: kept local
+docs/Day4_Interview_Questions_Senior_Answers.*

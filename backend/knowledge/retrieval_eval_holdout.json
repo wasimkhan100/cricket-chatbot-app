@@ -1,0 +1,16 @@
+[
+  {"q": "Is a wide counted as a ball faced?", "relevant": ["rule-wide-ball"]},
+  {"q": "What's the difference between a bye and a leg bye?", "relevant": ["rule-byes-and-leg-byes"]},
+  {"q": "How is net run rate calculated?", "relevant": ["rule-net-run-rate"]},
+  {"q": "How long is a strategic timeout?", "relevant": ["rule-strategic-timeout"]},
+  {"q": "Who lifted the trophy in 2014?", "relevant": ["match-517", "season-2014"]},
+  {"q": "2009 final in South Africa", "relevant": ["match-174", "season-2009"]},
+  {"q": "Who won the 2011 title?", "relevant": ["match-307", "season-2011"]},
+  {"q": "Orange cap race in 2016", "relevant": ["season-2016"]},
+  {"q": "Bumrah economy rate", "relevant": ["player-jj-bumrah"]},
+  {"q": "What kind of player is Suresh Raina?", "relevant": ["player-sk-raina"]},
+  {"q": "AB de Villiers batting numbers", "relevant": ["player-ab-de-villiers"]},
+  {"q": "Has Royal Challengers Bangalore ever won the IPL?", "relevant": ["team-royal-challengers-bangalore"]},
+  {"q": "Rajasthan Royals record", "relevant": ["team-rajasthan-royals"]},
+  {"q": "Mumbai Indians titles", "relevant": ["team-mumbai-indians"]}
+]

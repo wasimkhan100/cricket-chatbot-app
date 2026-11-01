@@ -1,0 +1,14 @@
+# Optional: Prometheus (metrics) + Jaeger (traces). The app works without these; the System tab covers the basics.
+#   docker compose -f ops/docker-compose.observability.yml up -d
+#   then set CRICKET_OTLP_ENDPOINT=http://127.0.0.1:4318/v1/traces in backend/.env and restart the app.
+#   Prometheus: http://127.0.0.1:9090   Jaeger: http://127.0.0.1:16686
+services:
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["127.0.0.1:9090:9090"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    environment: [COLLECTOR_OTLP_ENABLED=true]
+    ports: ["127.0.0.1:16686:16686", "127.0.0.1:4318:4318"]
